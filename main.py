@@ -15,11 +15,44 @@
 # limitations under the License.
 #
 import webapp2
+import os
+import logging
+from google.appengine.ext.webapp import template
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        # self.response.write('Hello world!')
+        logging.info('test init get')
+        template_values = {
+            'userName':'test'
+        }
+        path = os.path.join(os.path.dirname(__file__),'view','home.html')
+        self.response.out.write(template.render(path,template_values))
+
+class LoginHandler(webapp2.RequestHandler):
+    def post(self):
+        username = self.request.get('userName')
+        logging.info("username = "+username)
+
+        template_values = {
+            'userName':username
+        }
+        path = os.path.join(os.path.dirname(__file__),'view','timer.html')
+        self.response.out.write(template.render(path,template_values))
+
+
+    def get(self):
+        logging.info('test login get')
+        # self.response.write('Hello world!')
+        template_values = {
+            'userName':'test'
+        }
+        path = os.path.join(os.path.dirname(__file__),'view','home.html')
+        self.response.out.write(template.render(path,template_values))
+
+
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    webapp2.Route('/login', LoginHandler, name='login'),
 ], debug=True)

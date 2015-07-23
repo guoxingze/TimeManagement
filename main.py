@@ -26,19 +26,20 @@ class MainHandler(webapp2.RequestHandler):
         template_values = {
             'userName':'test'
         }
-        path = os.path.join(os.path.dirname(__file__),'view','home.html')
-        self.response.out.write(template.render(path,template_values))
+        path = os.path.join(os.path.dirname(__file__), 'view', 'home.html')
+        self.response.out.write(template.render(path, template_values))
 
 class LoginHandler(webapp2.RequestHandler):
     def post(self):
+
         username = self.request.get('userName')
         logging.info("username = "+username)
 
         template_values = {
             'userName':username
         }
-        path = os.path.join(os.path.dirname(__file__),'view','timer.html')
-        self.response.out.write(template.render(path,template_values))
+        path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')
+        self.response.out.write(template.render(path, template_values))
 
 
     def get(self):
@@ -47,12 +48,24 @@ class LoginHandler(webapp2.RequestHandler):
         template_values = {
             'userName':'test'
         }
-        path = os.path.join(os.path.dirname(__file__),'view','home.html')
-        self.response.out.write(template.render(path,template_values))
+        path = os.path.join(os.path.dirname(__file__), 'view', 'home.html')
+        self.response.out.write(template.render(path, template_values))
 
+
+class TimerHandler(webapp2.RequestHandler):
+
+    def get(self):
+        logging.info('test timer get')
+        # self.response.write('Hello world!')
+        template_values = {
+            'userName':'test'
+        }
+        path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     webapp2.Route('/login', LoginHandler, name='login'),
+    webapp2.Route('/timer', TimerHandler, name='login'),
 ], debug=True)

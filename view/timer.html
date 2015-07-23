@@ -2,8 +2,96 @@
 <html>
 <head>
 	<title>Timer</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<script src="../js/flipclock.js"></script>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="../css/flipclock.css">
+	<!-- Clock: http://flipclockjs.com/ -->
 </head>
 <body>
 <p>Hello "{{ userName }}"</p>
+	<div class="clock" style="margin:2em;"></div>
+	<div class="message"></div>
+	<button onclick="setTimer(5)">testTimer</button>
+<table>
+	<tr>
+		<td>
+			<div id="toDoList" class="listDiv">
+				<ul class="list" id="sortable">
+				  <li class="ui-state-default">Item 1</li>
+				  <li class="ui-state-default">Item 2</li>
+				  <li class="ui-state-default">Item 3</li>
+				  <li class="ui-state-default">Item 4</li>
+				  <li class="ui-state-default">Item 5</li>
+				  <li class="ui-state-default">Item 6</li>
+				  <li class="ui-state-default">Item 7</li>
+				</ul>
+			</div>
+		</td>
+
+		<td>
+			<div id="DoneList" class="listDiv">
+				<ul class="list" id="unsortable">
+				  <li class="ui-state-default">Item 1</li>
+				  <li class="ui-state-default">Item 2</li>
+				  <li class="ui-state-default">Item 3</li>
+				  <li class="ui-state-default">Item 4</li>
+				  <li class="ui-state-default">Item 5</li>
+				  <li class="ui-state-default">Item 6</li>
+				  <li class="ui-state-default">Item 7</li>
+				</ul>
+			</div>
+		</td>
+	</tr>
+
+</table>
+
+
+
 </body>
 </html>
+
+<script type="text/javascript">
+	var clock;
+	$(document).ready(function() {
+
+	$("#sortable" ).sortable();
+    // $( "#sortable" ).disableSelection();
+
+	console.log("Test");
+		clock = $('.clock').FlipClock(5, {
+	        clockFace: 'MinuteCounter',
+	        countdown: true,
+	        callbacks: {
+	        	stop: function() {
+	        		// $('.message').html('The clock has stopped!');
+	        		finishTomato()
+	        	}
+	        }
+	    });
+
+	});
+
+	function setTimer(time){
+		 clock.setTime(time)
+		 clock.start()
+	}
+
+	function finishTomato(){
+		// alert("test")
+	}
+
+</script>
+
+<style>
+  .list { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+  .list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+  .list li span { position: absolute; margin-left: -1.3em; }
+
+  .listDiv{
+  	width: 500px;
+  	background-color: #f4f4f4;
+  	padding:10px;
+  }
+</style>

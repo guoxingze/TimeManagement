@@ -14,6 +14,16 @@
 	<div class="clock" style="margin:2em;"></div>
 	<div class="message"></div>
 	<button onclick="setTimer(5)">testTimer</button>
+
+<div id="confirmColorBox">
+
+	<p>Do you want to save this tomato</p>
+	<button onclick="ajaxTest()">Save</button>
+	<button>Cancel</button>
+
+
+</div>
+
 <table>
 	<tr>
 		<td>
@@ -82,6 +92,23 @@
 		// alert("test")
 	}
 
+	function ajaxTest(){
+		console.log("enter ajax test");
+		$.ajax({
+		  type: "POST",
+		  url: "../api/save",
+		  dataType: 'json',
+		  data: JSON.stringify({ "storyKey": 18})
+		})
+		.done(function( data ) { // check why I use done
+		    alert( "Vote Cast!!! Count is : " + data['story'] );
+		    // $('.voteCount').text(data['story']['vote_count']);
+		});
+	}
+
+
+
+;
 </script>
 
 <style>

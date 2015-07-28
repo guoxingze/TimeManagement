@@ -20,6 +20,11 @@ import logging
 import json
 import time
 from google.appengine.ext.webapp import template
+from google.appengine.ext import db
+
+class Pet(db.Model):
+  name = db.StringProperty(required=True)
+  weight_in_pounds = db.IntegerProperty()
 
 class save_tomato_handler(webapp2.RequestHandler):
     def get(self):
@@ -29,9 +34,14 @@ class save_tomato_handler(webapp2.RequestHandler):
     def post(self):
         logging.info(self.request.body)
         time.sleep(2)
-        data = json.loads(self.request.body)
-        self.response.out.write(json.dumps(({'story': 42})))
 
+        # pet = Pet(name="Fluffy",weight_in_pounds=37)
+        # pet.put();
+        data = json.loads(self.request.body)
+        query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
+        logging.info(query)
+        logging.info(query.fetch(0))
+        self.response.out.write(json.dumps(({'story': 42})))
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/api/save', save_tomato_handler, name='login'),

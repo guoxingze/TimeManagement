@@ -5,8 +5,10 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 	<script src="../js/flipclock.js"></script>
+	<script src="../js/knockout.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="../css/flipclock.css">
+	<!-- Knockout foreach binding http://knockoutjs.com/documentation/foreach-binding.html -->
 	<!-- Clock: http://flipclockjs.com/ -->
 </head>
 <body>
@@ -28,14 +30,14 @@
 	<tr>
 		<td>
 			<div id="toDoList" class="listDiv">
-				<ul class="list" id="sortable">
-				  <li class="ui-state-default"><span>Item 1</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 2</span><input class="eventCheck" type="checkbox"/></li>
+				<ul data-bind="foreach: people" class="list" id="sortable">
+				  <li class="ui-state-default"><span data-bind="text: name"></span><input class="eventCheck" type="checkbox"/></li>
+<!-- 				  <li class="ui-state-default"><span>Item 2</span><input class="eventCheck" type="checkbox"/></li>
 				  <li class="ui-state-default"><span>Item 3</span><input class="eventCheck" type="checkbox"/></li>
 				  <li class="ui-state-default"><span>Item 4</span><input class="eventCheck" type="checkbox"/></li>
 				  <li class="ui-state-default"><span>Item 5</span><input class="eventCheck" type="checkbox"/></li>
 				  <li class="ui-state-default"><span>Item 6</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 7</span><input class="eventCheck" type="checkbox"/></li>
+				  <li class="ui-state-default"><span>Item 7</span><input class="eventCheck" type="checkbox"/></li> -->
 				</ul>
 			</div>
 		</td>
@@ -57,17 +59,41 @@
 
 </table>
 
+<button data-bind="click: addPerson">Add</button>
+
 
 
 </body>
 </html>
 
 <script type="text/javascript">
+
+function AppViewModel() {
+    var self = this;
+
+    self.people = ko.observableArray([
+        { name: 'Bert' },
+        { name: 'Charles' },
+        { name: 'Denise' }
+    ]);
+
+    self.addPerson = function() {
+        self.people.push({ name: "New at " + new Date() });
+    };
+
+    self.removePerson = function() {
+        self.people.remove(this);
+    }
+}
+
+ko.applyBindings(new AppViewModel());
+
+
 	var clock;
 	$(document).ready(function() {
 
 	$("#sortable" ).sortable();
-    $( "#sortable" ).disableSelection();
+    $("#sortable" ).disableSelection();
 
 	console.log("Test");
 		clock = $('.clock').FlipClock(5, {

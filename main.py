@@ -67,5 +67,5 @@ class TimerHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     webapp2.Route('/login', LoginHandler, name='login'),
-    webapp2.Route('/timer', TimerHandler, name='login'),
+    webapp2.Route('/timer', TimerHandler, name='timer'),
 ], debug=True)

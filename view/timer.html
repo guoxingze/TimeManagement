@@ -32,12 +32,6 @@
 			<div id="toDoList" class="listDiv">
 				<ul data-bind="foreach: people" class="list" id="sortable">
 				  <li class="ui-state-default"><span data-bind="text: name"></span><input class="eventCheck" type="checkbox"/></li>
-<!-- 				  <li class="ui-state-default"><span>Item 2</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 3</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 4</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 5</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 6</span><input class="eventCheck" type="checkbox"/></li>
-				  <li class="ui-state-default"><span>Item 7</span><input class="eventCheck" type="checkbox"/></li> -->
 				</ul>
 			</div>
 		</td>
@@ -58,8 +52,8 @@
 	</tr>
 
 </table>
-
-<button data-bind="click: addPerson">Add</button>
+<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
+<button data-bind="click: addPerson, enable:newEventName().length>0">Add</button>
 
 
 
@@ -71,19 +65,23 @@
 function AppViewModel() {
     var self = this;
 
+    self.newEventName= ko.observable("test");
     self.people = ko.observableArray([
-        { name: 'Bert' },
-        { name: 'Charles' },
-        { name: 'Denise' }
+
     ]);
 
     self.addPerson = function() {
-        self.people.push({ name: "New at " + new Date() });
+    	var newEventName = $("#newEventName").val();
+        ajaxTest(newEventName);
+        self.people.push({ name: newEventName });
+        // $("#newEventName").val('');
+        self.newEventName("");
     };
 
     self.removePerson = function() {
         self.people.remove(this);
-    }
+    };
+    console.log("size of newEventName = " + newEventName.length);
 }
 
 ko.applyBindings(new AppViewModel());
@@ -102,7 +100,7 @@ ko.applyBindings(new AppViewModel());
 	        callbacks: {
 	        	stop: function() {
 	        		// $('.message').html('The clock has stopped!');
-	        		finishTomato()
+	        		finishTomato();
 	        	}
 	        }
 	    });
@@ -110,31 +108,27 @@ ko.applyBindings(new AppViewModel());
 	});
 
 	function setTimer(time){
-		 clock.setTime(time)
-		 clock.start()
+		 clock.setTime(time);
+		 clock.start();
 	}
 
 	function finishTomato(){
 		// alert("test")
 	}
 
-	function ajaxTest(){
+	function ajaxTest(newEventName){
 		console.log("enter ajax test");
 		$.ajax({
 		  type: "POST",
 		  url: "../api/save",
 		  dataType: 'json',
-		  data: JSON.stringify({ "storyKey": 18})
+		  data: JSON.stringify({ "eventName": newEventName})
 		})
 		.done(function( data ) { // check why I use done
-		    alert( "Vote Cast!!! Count is : " + data['story'] );
+		    console.log( "event added");
 		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}
-
-
-
-;
 </script>
 
 <style>

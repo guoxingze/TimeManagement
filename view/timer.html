@@ -33,7 +33,7 @@
 	<tr>
 		<td>
 			<div id="toDoList" class="listDiv">
-				<ul data-bind="foreach: people" class="list" id="sortable">
+				<ul data-bind="foreach: eventList" class="list" id="sortable">
 				  <li class="ui-state-default">
 				  	<span data-bind="text: name"></span>
 				  	<input class="eventCheck" type="checkbox"/>
@@ -79,7 +79,7 @@
 var eventListInDB = {{eventList}};
 
 window.vm = new AppViewModel();
-window.vm.people(eventListInDB);
+window.vm.eventList(eventListInDB);
 ko.applyBindings(vm);
 
 for (var i = 0; i<eventListInDB.length; i++) {
@@ -104,7 +104,7 @@ function AppViewModel() {
 
     self.addEvent = function() {
     	var newEventName = $("#newEventName").val();
-        ajaxTest(newEventName);
+        saveNewEvent(newEventName);
         self.eventList.push({ name: newEventName });
         // $("#newEventName").val('');
         self.newEventName("");
@@ -112,6 +112,7 @@ function AppViewModel() {
 
     self.removeSelected = function(input) {
     	self.eventList.remove(input)
+    	deleteNewEvent(input['name'])
     };
 
     console.log("size of newEventName = " + newEventName.length);
@@ -150,7 +151,7 @@ function AppViewModel() {
 		// alert("test")
 	}
 
-	function ajaxTest(newEventName){
+	function saveNewEvent(newEventName){
 		console.log("enter ajax test");
 		$.ajax({
 		  type: "POST",
@@ -160,6 +161,21 @@ function AppViewModel() {
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
+		    // $('.voteCount').text(data['story']['vote_count']);
+		});
+	}
+
+	function deleteNewEvent(eventName){
+		console.log("enter ajax test");
+		console.log("deleted eventName = " + eventName);
+		$.ajax({
+		  type: "POST",
+		  url: "../api/delete",
+		  dataType: 'json',
+		  data: JSON.stringify({ "eventName": eventName})
+		})
+		.done(function( data ) { // check why I use done
+		    console.log( "event deleted");
 		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}

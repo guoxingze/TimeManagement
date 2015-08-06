@@ -25,7 +25,7 @@ from google.appengine.ext import db
 class Event(db.Model):
   name = db.StringProperty(required=True)
 
-class save_tomato_handler(webapp2.RequestHandler):
+class save_event_handler(webapp2.RequestHandler):
     """
     test docString
     """
@@ -43,9 +43,32 @@ class save_tomato_handler(webapp2.RequestHandler):
         # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
         # logging.info(query)
         # logging.info(query.fetch(0))
-        logging.info(data)
+        self.response.out.write(json.dumps(({'story': 42})))
+
+
+class delete_event_handler(webapp2.RequestHandler):
+    """
+    test docString
+    """
+    def get(self):
+        logging.info('test save get')
+
+    def post(self):
+        logging.info(self.request.body)
+
+        data = json.loads(self.request.body)
+        eventName = data['eventName']
+        logging.info("delete event name = %s" % eventName)
+
+
+        logging.info(r"SELECT * FROM Event WHERE name = '%s'" % eventName)
+        query = db.GqlQuery(r"SELECT * FROM Event WHERE name = '%s'" % eventName)
+        results = query.fetch(1)
+        db.delete(results)
+
         self.response.out.write(json.dumps(({'story': 42})))
 
 app = webapp2.WSGIApplication([
-    webapp2.Route('/api/save', save_tomato_handler, name='login'),
+    webapp2.Route('/api/save', save_event_handler, name='login'),
+    webapp2.Route('/api/delete', delete_event_handler, name='login'),
 ], debug=True)

@@ -1,3 +1,4 @@
+{% autoescape off %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,8 @@
 </head>
 <body>
 <p>Hello "{{ userName }}"</p>
+<!-- <p>Hello "{{ eventList }}"</p> -->
+
 	<div class="clock" style="margin:2em;"></div>
 	<div class="message"></div>
 	<button onclick="setTimer(5)">testTimer</button>
@@ -31,7 +34,11 @@
 		<td>
 			<div id="toDoList" class="listDiv">
 				<ul data-bind="foreach: people" class="list" id="sortable">
-				  <li class="ui-state-default"><span data-bind="text: name"></span><input class="eventCheck" type="checkbox"/></li>
+				  <li class="ui-state-default">
+				  	<span data-bind="text: name"></span>
+				  	<input class="eventCheck" type="checkbox"/>
+				  	<button data-bind="click: $parent.removeSelected">Remove</button>
+				  </li>
 				</ul>
 			</div>
 		</td>
@@ -53,38 +60,65 @@
 
 </table>
 <input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
-<button data-bind="click: addPerson, enable:newEventName().length>0">Add</button>
+<button data-bind="click: addEvent, enable:newEventName().length>0">Add</button>
 
+
+<!-- {% for event in eventList%}
+<script type="text/javascript">
+	// console.log({{event.name}})
+	// console.log("test")
+	eventListInDB.push({{event.name}});
+</script>
+	 <p>{{ event.name}}</p>
+{% endfor %} -->
 
 
 </body>
-</html>
-
 <script type="text/javascript">
+
+var eventListInDB = {{eventList}};
+
+window.vm = new AppViewModel();
+window.vm.people(eventListInDB);
+ko.applyBindings(vm);
+
+for (var i = 0; i<eventListInDB.length; i++) {
+	console.log("event " + i + " = " + eventListInDB[i])
+	console.log("name " + i + " = " + eventListInDB[i].name)
+};
+console.log("eventListInDB = " + eventListInDB)
+
+// for (var i; i >= 0; i--) {
+// 	Things[i]
+// };
+
+
 
 function AppViewModel() {
     var self = this;
 
     self.newEventName= ko.observable("test");
-    self.people = ko.observableArray([
+    self.eventList = ko.observableArray([
 
     ]);
 
-    self.addPerson = function() {
+    self.addEvent = function() {
     	var newEventName = $("#newEventName").val();
         ajaxTest(newEventName);
-        self.people.push({ name: newEventName });
+        self.eventList.push({ name: newEventName });
         // $("#newEventName").val('');
         self.newEventName("");
     };
 
-    self.removePerson = function() {
-        self.people.remove(this);
+    self.removeSelected = function(input) {
+    	self.eventList.remove(input)
     };
+
     console.log("size of newEventName = " + newEventName.length);
 }
 
-ko.applyBindings(new AppViewModel());
+
+// ko.applyBindings(new AppViewModel());
 
 
 	var clock;
@@ -130,6 +164,9 @@ ko.applyBindings(new AppViewModel());
 		});
 	}
 </script>
+</html>
+{% endautoescape %}
+
 
 <style>
   .list { list-style-type: none; margin: 0; padding: 0; width: 100%; }

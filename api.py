@@ -34,7 +34,6 @@ class save_tomato_handler(webapp2.RequestHandler):
 
     def post(self):
         logging.info(self.request.body)
-        time.sleep(2)
 
         data = json.loads(self.request.body)
         eventName = data['eventName']

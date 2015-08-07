@@ -23,11 +23,17 @@
 <div id="confirmColorBox">
 
 	<p>Do you want to save this tomato</p>
-	<button onclick="ajaxTest()">Save</button>
+	<button onclick="saveTomato()">Save</button>
 	<button>Cancel</button>
-
-
 </div>
+
+
+
+<div id="newEventDiv" style='margin-top:20px'>
+	<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
+	<button data-bind="click: addEvent, enable:newEventName().length>0">Add</button>
+</div>
+
 
 <table>
 	<tr>
@@ -43,24 +49,35 @@
 			</div>
 		</td>
 
+
 		<td>
-			<div id="DoneList" class="listDiv">
-				<ul class="list" id="unsortable">
-				  <li class="ui-state-default">Item 1</li>
-				  <li class="ui-state-default">Item 2</li>
-				  <li class="ui-state-default">Item 3</li>
-				  <li class="ui-state-default">Item 4</li>
-				  <li class="ui-state-default">Item 5</li>
-				  <li class="ui-state-default">Item 6</li>
-				  <li class="ui-state-default">Item 7</li>
+			<div id="toDoList" class="listDiv">
+				<ul data-bind="foreach: eventList" class="list" id="sortable">
+				  <li class="ui-state-default">
+				  	<span data-bind="text: name"></span>
+				  	<input class="eventCheck" type="checkbox"/>
+				  	<button data-bind="click: $parent.removeSelected">Remove</button>
+				  </li>
 				</ul>
 			</div>
 		</td>
+
+<!-- 		<td>
+	<div id="DoneList" class="listDiv">
+		<ul class="list" id="unsortable">
+		  <li class="ui-state-default">Item 1</li>
+		  <li class="ui-state-default">Item 2</li>
+		  <li class="ui-state-default">Item 3</li>
+		  <li class="ui-state-default">Item 4</li>
+		  <li class="ui-state-default">Item 5</li>
+		  <li class="ui-state-default">Item 6</li>
+		  <li class="ui-state-default">Item 7</li>
+		</ul>
+	</div>
+</td> -->
 	</tr>
 
 </table>
-<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
-<button data-bind="click: addEvent, enable:newEventName().length>0">Add</button>
 
 
 <!-- {% for event in eventList%}
@@ -98,9 +115,12 @@ function AppViewModel() {
     var self = this;
 
     self.newEventName= ko.observable("test");
-    self.eventList = ko.observableArray([
+    self.eventList = ko.observableArray([]);
+    self.completedList = ko.observableArray([]);
 
-    ]);
+    self.testFunction = function(){
+    	console.log("test function 1")
+    }
 
     self.addEvent = function() {
     	var newEventName = $("#newEventName").val();
@@ -129,13 +149,14 @@ function AppViewModel() {
     $("#sortable" ).disableSelection();
 
 	console.log("Test");
-		clock = $('.clock').FlipClock(5, {
+		clock = $('.clock').FlipClock(0, {
 	        clockFace: 'MinuteCounter',
 	        countdown: true,
 	        callbacks: {
 	        	stop: function() {
 	        		// $('.message').html('The clock has stopped!');
 	        		finishTomato();
+	        		window.vm.testFunction();
 	        	}
 	        }
 	    });
@@ -148,6 +169,7 @@ function AppViewModel() {
 	}
 
 	function finishTomato(){
+		$('#confirmColorBox').show();
 		// alert("test")
 	}
 
@@ -178,6 +200,10 @@ function AppViewModel() {
 		    console.log( "event deleted");
 		    // $('.voteCount').text(data['story']['vote_count']);
 		});
+	}
+
+	function saveTomato(){
+		console.log('test 2')
 	}
 </script>
 </html>

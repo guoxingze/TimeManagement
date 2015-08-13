@@ -155,7 +155,7 @@ function AppViewModel() {
 	        callbacks: {
 	        	stop: function() {
 	        		// $('.message').html('The clock has stopped!');
-	        		finishTomato();
+	        		completeTomato("testeventname");
 	        		window.vm.testFunction();
 	        	}
 	        }
@@ -168,9 +168,21 @@ function AppViewModel() {
 		 clock.start();
 	}
 
-	function finishTomato(){
+	function completeTomato(completedTomato){
 		$('#confirmColorBox').show();
 		// alert("test")
+
+		console.log("enter completeTomato");
+		$.ajax({
+		  type: "POST",
+		  url: "../api/complete",
+		  dataType: 'json',
+		  data: JSON.stringify({ "eventName": completedTomato})
+		})
+		.done(function( data ) { // check why I use done
+		    console.log( "event added");
+		    // $('.voteCount').text(data['story']['vote_count']);
+		});
 	}
 
 	function saveNewEvent(newEventName){

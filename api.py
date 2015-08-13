@@ -23,7 +23,33 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 
 class Event(db.Model):
-  name = db.StringProperty(required=True)
+    name = db.StringProperty(required=True)
+
+class CompletedTomato(db.Model):
+    name = db.StringProperty(required=True)
+    time = db.StringProperty(required=False)
+
+
+class completed_event_handler(webapp2.RequestHandler):
+    """
+    test docString
+    """
+    def get(self):
+        logging.info('test completed_event_handler get')
+
+    def post(self):
+        logging.info(self.request.body)
+
+        data = json.loads(self.request.body)
+        eventName = data['eventName']
+
+        completedEvent = CompletedTomato(name=eventName,time="2015-01-01")
+        completedEvent.put()
+        # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
+        # logging.info(query)
+        # logging.info(query.fetch(0))
+        self.response.out.write(json.dumps(({'story': 42})))
+
 
 class save_event_handler(webapp2.RequestHandler):
     """
@@ -71,4 +97,5 @@ class delete_event_handler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     webapp2.Route('/api/save', save_event_handler, name='login'),
     webapp2.Route('/api/delete', delete_event_handler, name='login'),
+    webapp2.Route('/api/complete', completed_event_handler, name='login'),
 ], debug=True)

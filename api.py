@@ -30,7 +30,7 @@ class CompletedTomato(db.Model):
     time = db.StringProperty(required=False)
 
 
-class completed_event_handler(webapp2.RequestHandler):
+class CompletedEventHandler(webapp2.RequestHandler):
     """
     test docString
     """
@@ -42,6 +42,9 @@ class completed_event_handler(webapp2.RequestHandler):
 
         data = json.loads(self.request.body)
         eventName = data['eventName']
+
+        if eventName == "":
+            eventName = "No Event Name"
 
         completedEvent = CompletedTomato(name=eventName,time="2015-01-01")
         completedEvent.put()
@@ -97,5 +100,5 @@ class delete_event_handler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     webapp2.Route('/api/save', save_event_handler, name='login'),
     webapp2.Route('/api/delete', delete_event_handler, name='login'),
-    webapp2.Route('/api/complete', completed_event_handler, name='login'),
+    webapp2.Route('/api/complete', CompletedEventHandler, name='login'),
 ], debug=True)

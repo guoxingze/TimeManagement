@@ -73,30 +73,23 @@ class TimerHandler(webapp2.RequestHandler):
     def get(self):
         logging.info('test timer get')
         # self.response.write('Hello world!')
-        query = db.GqlQuery("SELECT * FROM Event")
+        eventQuery = db.GqlQuery("SELECT * FROM Event")
         # eventList = query.fetch(2)
-        eventList = list(db.to_dict(event) for event in query.run())
+        eventList = list(db.to_dict(event) for event in eventQuery.run())
         eventList2 = json.dumps(eventList)
-        # eventList2 = db.to_dict(eventList)
-        # logging.info(str(eventList))
-        # logging.info(type(eventList))
 
-        # for p in eventList:
-        #      logging.info("%s inches tall" % (p.name))
+        completedQuery = db.GqlQuery("SELECT * FROM CompletedTomato")
+        # eventList = query.fetch(2)
+        completedList = list(db.to_dict(CompletedTomato) for CompletedTomato in completedQuery.run())
+        completedList2 = json.dumps(completedList)
 
         logging.info(len(eventList))
-        # logging.info(eventList.name)
-        # logging.info(type(eventList.fetch(1)))
-        # logging.info(vars(eventList.fetch(1)))
-        # logging.info(str(query))
-        # logging.info(type(query))
-        # logging.info(type(query.fetch(1)))
-        # logging.info(vars(query.fetch(1)))
-        # logging.info(query.fetch(1).name())
+
 
         template_values = {
             'userName':'test',
-            'eventList':eventList2
+            'eventList':eventList2,
+            'completedList':completedList2
             # 'eventList':eventList
         }
         path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')

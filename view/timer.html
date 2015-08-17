@@ -38,25 +38,28 @@
 <table>
 	<tr>
 		<td>
-			<div id="toDoList" class="listDiv">
-				<ul data-bind="foreach: eventList" class="list" id="sortable">
-				  <li class="ui-state-default">
-				  	<span data-bind="text: name"></span>
-				  	<input class="eventCheck" type="checkbox"/>
-				  	<button data-bind="click: $parent.removeSelected">Remove</button>
-				  </li>
-				</ul>
-			</div>
-		</td>
+	<div id="toDoList" class="listDiv">
+		<ul data-bind="foreach: eventList" class="list" id="sortable">
+		  <li class="ui-state-default">
+		  	<span data-bind="text: name"></span>
+		  	<input class="eventCheck" type="checkbox" data-bind="value: name"/>
+		  	<button data-bind="click: $parent.removeSelected">Remove</button>
+		  </li>
+		</ul>
+	</div>
+</td>
 
+
+<!-- <input type="radio" value="Gamma" data-bind="checked: radioSelectedOptionValue" />Gamma -->
 
 		<td>
 			<div id="toDoList" class="listDiv">
-				<ul data-bind="foreach: eventList" class="list" id="sortable">
+				<ul data-bind="foreach: completedList" class="list" id="sortable">
 				  <li class="ui-state-default">
 				  	<span data-bind="text: name"></span>
-				  	<input class="eventCheck" type="checkbox"/>
-				  	<button data-bind="click: $parent.removeSelected">Remove</button>
+				  	<span class="completedTime" data-bind="text: time"></span>
+				  <!-- 	<input class="eventCheck" type="checkbox"/>
+				  	<button data-bind="click: $parent.removeSelected">Remove</button> -->
 				  </li>
 				</ul>
 			</div>
@@ -77,6 +80,7 @@
 </td> -->
 	</tr>
 
+
 </table>
 
 
@@ -93,10 +97,14 @@
 </body>
 <script type="text/javascript">
 
+var workingEvent = "";
+//set event list
 var eventListInDB = {{eventList}};
+var completedListInDB = {{completedList}};
 
 window.vm = new AppViewModel();
 window.vm.eventList(eventListInDB);
+window.vm.completedList(completedListInDB);
 ko.applyBindings(vm);
 
 for (var i = 0; i<eventListInDB.length; i++) {
@@ -109,15 +117,24 @@ console.log("eventListInDB = " + eventListInDB)
 // 	Things[i]
 // };
 
+//bind onclick for event list
+$('.eventCheck').click(function(){
+	$('.eventCheck').not(this).each(function(){
+         $(this).attr('checked', false);
+     });
+	workingEvent = this.value
+	console.log('value = ' + workingEvent)
 
+})
 
 function AppViewModel() {
     var self = this;
-
     self.newEventName= ko.observable("test");
     self.eventList = ko.observableArray([]);
     self.completedList = ko.observableArray([]);
-
+    self.checkEvent = function(){
+    	console.log("test check")
+    }
     self.testFunction = function(){
     	console.log("test function 1")
     }
@@ -135,6 +152,9 @@ function AppViewModel() {
     	deleteNewEvent(input['name'])
     };
 
+    self.selectEvent = function() {
+		console.log("input = " + input)
+    };
     console.log("size of newEventName = " + newEventName.length);
 }
 
@@ -155,7 +175,7 @@ function AppViewModel() {
 	        callbacks: {
 	        	stop: function() {
 	        		// $('.message').html('The clock has stopped!');
-	        		completeTomato("testeventname");
+	        		completeTomato(workingEvent);
 	        		window.vm.testFunction();
 	        	}
 	        }
@@ -235,5 +255,9 @@ function AppViewModel() {
 
   .eventCheck{
   	margin-left:300px;
+  }
+
+  .completedTime{
+  	margin-left:300px !important;
   }
 </style>

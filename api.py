@@ -19,6 +19,7 @@ import os
 import logging
 import json
 import time
+from datetime import datetime
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 
@@ -46,7 +47,7 @@ class CompletedEventHandler(webapp2.RequestHandler):
         if eventName == "":
             eventName = "No Event Name"
 
-        completedEvent = CompletedTomato(name=eventName,time="2015-01-01")
+        completedEvent = CompletedTomato(name=eventName,time=str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         completedEvent.put()
         # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
         # logging.info(query)

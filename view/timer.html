@@ -7,14 +7,26 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 	<script src="../js/flipclock.js"></script>
 	<script src="../js/knockout.js"></script>
+	<script src="../js/jquery.colorbox.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="../css/flipclock.css">
+	<link rel="stylesheet" href="../css/colorbox.css" />
 	<!-- Knockout foreach binding http://knockoutjs.com/documentation/foreach-binding.html -->
 	<!-- Clock: http://flipclockjs.com/ -->
 </head>
 <body>
 <p>Hello "{{ userName }}"</p>
 <!-- <p>Hello "{{ eventList }}"</p> -->
+	<button onclick="showCompleteBox()">Test show</button>
+<!-- Event add/edit -->
+	<div style="display:none">
+		<div id="completedColorBox" class="allColorBox">
+			<p>Completed!</p>
+			<input type="text" id="completeEventName"/>
+			<button class="saveColorbox" onclick="saveInColorBox()">Save Completed</button>
+
+		</div>
+	</div>
 
 	<div class="clock" style="margin:2em;"></div>
 	<div class="message"></div>
@@ -164,7 +176,10 @@ function AppViewModel() {
 
 	var clock;
 	$(document).ready(function() {
-
+//set color box
+$.colorbox.settings.close = 'Exit';
+// $("#eventCbox, #eventCbox1, #eventCbox1").colorbox({inline:true, width:"50%", overlayClose: false});
+//color box done
 	$("#sortable" ).sortable();
     $("#sortable" ).disableSelection();
 
@@ -237,6 +252,18 @@ function AppViewModel() {
 	function saveTomato(){
 		console.log('test 2')
 	}
+
+	function showCompleteBox(){
+		console.log("show completed color box");
+		$.colorbox({inline:true, width:"50%",height:"50%", overlayClose: false, href:"#completedColorBox"});
+	}
+
+	function saveInColorBox(){
+		console.log("save completed event");
+		var completeEventName = $('#completeEventName').val()
+		completeTomato(completeEventName);
+		$.colorbox.close();
+	}
 </script>
 </html>
 {% endautoescape %}
@@ -260,4 +287,6 @@ function AppViewModel() {
   .completedTime{
   	margin-left:300px !important;
   }
+
+
 </style>

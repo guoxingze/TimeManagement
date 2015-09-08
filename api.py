@@ -33,7 +33,7 @@ class CompletedTomato(db.Model):
 
 class CompletedEventHandler(webapp2.RequestHandler):
     """
-    test docString
+    Save completed event to DB
     """
     def get(self):
         logging.info('test completed_event_handler get')
@@ -47,17 +47,15 @@ class CompletedEventHandler(webapp2.RequestHandler):
         if eventName == "":
             eventName = "No Event Name"
 
-        completedEvent = CompletedTomato(name=eventName,time=str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+# TODO change time zone
+        completedEvent = CompletedTomato(name=eventName,time=str(datetime.now().strftime('%Y-%m-%d %H:%M')))
         completedEvent.put()
-        # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
-        # logging.info(query)
-        # logging.info(query.fetch(0))
-        self.response.out.write(json.dumps(({'story': 42})))
+        self.response.out.write(json.dumps(({'name': completedEvent.name,'time':completedEvent.time})))
 
 
 class save_event_handler(webapp2.RequestHandler):
     """
-    test docString
+    save event to to do list
     """
     def get(self):
         logging.info('test save get')
@@ -78,7 +76,7 @@ class save_event_handler(webapp2.RequestHandler):
 
 class delete_event_handler(webapp2.RequestHandler):
     """
-    test docString
+    delete event from to do list
     """
     def get(self):
         logging.info('test save get')

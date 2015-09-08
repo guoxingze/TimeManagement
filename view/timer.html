@@ -43,67 +43,45 @@
 
 <div id="newEventDiv" style='margin-top:20px'>
 	<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
-	<button data-bind="click: addEvent, enable:newEventName().length>0">Add</button>
+	<button data-bind="click: addToDoEvent, enable:newEventName().length>0">Add</button>
 </div>
 
 
-<table>
-	<tr>
-		<td>
-	<div id="toDoList" class="listDiv">
+<!-- <table> -->
+	<!-- <tr> -->
+		<!-- <td> -->
+		
+	<div id="toDoList" class="listDiv" style="height: 200px;overflow: auto">
 		<ul data-bind="foreach: eventList" class="list" id="sortable">
 		  <li class="ui-state-default">
-		  	<span data-bind="text: name"></span>
-		  	<input class="eventCheck" type="checkbox" data-bind="value: name"/>
-		  	<button data-bind="click: $parent.removeSelected">Remove</button>
+		  	<div class="eventNameSpan" data-bind="text: name" style="float:left; width:10%"></div>
+		  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%"></input></div>
+		  	<div><button data-bind="click: $parent.removeSelected" style="float:left">Remove</button></div>
 		  </li>
 		</ul>
 	</div>
-</td>
+
+<!-- </td> -->
 
 
 <!-- <input type="radio" value="Gamma" data-bind="checked: radioSelectedOptionValue" />Gamma -->
 
-		<td>
-			<div id="toDoList" class="listDiv">
+		<!-- <td> -->
+
+			<div id="toDoList" class="listDiv" style="height: 200px;overflow: auto">
 				<ul data-bind="foreach: completedList" class="list" id="sortable">
 				  <li class="ui-state-default">
-				  	<span data-bind="text: name"></span>
-				  	<span class="completedTime" data-bind="text: time"></span>
-				  <!-- 	<input class="eventCheck" type="checkbox"/>
-				  	<button data-bind="click: $parent.removeSelected">Remove</button> -->
+				  	<div data-bind="text: name" style="float:left"></div>
+				  	<div class="completedTime" data-bind="text: time"></div>
 				  </li>
 				</ul>
 			</div>
-		</td>
-
-<!-- 		<td>
-	<div id="DoneList" class="listDiv">
-		<ul class="list" id="unsortable">
-		  <li class="ui-state-default">Item 1</li>
-		  <li class="ui-state-default">Item 2</li>
-		  <li class="ui-state-default">Item 3</li>
-		  <li class="ui-state-default">Item 4</li>
-		  <li class="ui-state-default">Item 5</li>
-		  <li class="ui-state-default">Item 6</li>
-		  <li class="ui-state-default">Item 7</li>
-		</ul>
-	</div>
-</td> -->
-	</tr>
+		<!-- </td> -->
+	<!-- </tr> -->
 
 
-</table>
+<!-- </table> -->
 
-
-<!-- {% for event in eventList%}
-<script type="text/javascript">
-	// console.log({{event.name}})
-	// console.log("test")
-	eventListInDB.push({{event.name}});
-</script>
-	 <p>{{ event.name}}</p>
-{% endfor %} -->
 
 
 </body>
@@ -125,9 +103,6 @@ for (var i = 0; i<eventListInDB.length; i++) {
 };
 console.log("eventListInDB = " + eventListInDB)
 
-// for (var i; i >= 0; i--) {
-// 	Things[i]
-// };
 
 //bind onclick for event list
 $('.eventCheck').click(function(){
@@ -151,10 +126,17 @@ function AppViewModel() {
     	console.log("test function 1")
     }
 
-    self.addEvent = function() {
+    self.addToDoEvent = function() {
     	var newEventName = $("#newEventName").val();
         saveNewEvent(newEventName);
         self.eventList.push({ name: newEventName });
+        // $("#newEventName").val('');
+        self.newEventName("");
+    };
+
+    self.addCompletedEvent = function(name,time) {
+    	console.log('test addCompletedEvent')
+        self.completedList.push({ name: name,time:time});
         // $("#newEventName").val('');
         self.newEventName("");
     };
@@ -190,7 +172,8 @@ $.colorbox.settings.close = 'Exit';
 	        callbacks: {
 	        	stop: function() {
 	        		// $('.message').html('The clock has stopped!');
-	        		completeTomato(workingEvent);
+	        		// completeTomato(workingEvent);
+	        		showCompleteBox();
 	        		window.vm.testFunction();
 	        	}
 	        }
@@ -216,6 +199,7 @@ $.colorbox.settings.close = 'Exit';
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
+		    window.vm.addCompletedEvent(data['name'],data['time']);
 		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}
@@ -256,6 +240,7 @@ $.colorbox.settings.close = 'Exit';
 	function showCompleteBox(){
 		console.log("show completed color box");
 		$.colorbox({inline:true, width:"50%",height:"50%", overlayClose: false, href:"#completedColorBox"});
+		$("#completeEventName").val(workingEvent);
 	}
 
 	function saveInColorBox(){
@@ -275,7 +260,7 @@ $.colorbox.settings.close = 'Exit';
   .list li span { position: absolute; margin-left: -1.3em; }
 
   .listDiv{
-  	width: 500px;
+  	width: 550px;
   	background-color: #f4f4f4;
   	padding:10px;
   }
@@ -288,5 +273,7 @@ $.colorbox.settings.close = 'Exit';
   	margin-left:300px !important;
   }
 
-
+/* .eventNameSpan{
+ 	display: inline-block;
+ }*/
 </style>

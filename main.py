@@ -85,11 +85,15 @@ class TimerHandler(webapp2.RequestHandler):
 
         logging.info(len(eventList))
 
-
+        today_achieve = api.read_achieve_today()
+        total_achieve = api.read_achieve_total()
+        logging.info("today_achieve = %s" % today_achieve)
         template_values = {
             'userName':'test',
             'eventList':eventList2,
-            'completedList':completedList2
+            'completedList':completedList2,
+            'today':today_achieve,
+            'total':total_achieve
             # 'eventList':eventList
         }
         path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')

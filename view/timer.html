@@ -32,13 +32,14 @@
 	<div class="message"></div>
 	<button onclick="setTimer(5)">testTimer</button>
 
+<!-- 
 <div id="confirmColorBox">
 
 	<p>Do you want to save this tomato</p>
 	<button onclick="saveTomato()">Save</button>
 	<button>Cancel</button>
 </div>
-
+ -->
 
 
 <div id="newEventDiv" style='margin-top:20px'>
@@ -67,7 +68,11 @@
 <!-- <input type="radio" value="Gamma" data-bind="checked: radioSelectedOptionValue" />Gamma -->
 
 		<!-- <td> -->
-
+	<div style="width:560px">
+		<p>
+		<span style="float:right">Total<span id="totalAchieve"></span></span>
+		<span style="float:right">Today<span id="todayAchieve"></span></span>
+		</p>
 			<div id="toDoList" class="listDiv" style="height: 200px;overflow: auto">
 				<ul data-bind="foreach: completedList" class="list" id="sortable">
 				  <li class="ui-state-default">
@@ -76,6 +81,7 @@
 				  </li>
 				</ul>
 			</div>
+	</div>
 		<!-- </td> -->
 	<!-- </tr> -->
 
@@ -91,6 +97,8 @@ var workingEvent = "";
 //set event list
 var eventListInDB = {{eventList}};
 var completedListInDB = {{completedList}};
+$('#totalAchieve').text({{ total }});
+$('#todayAchieve').text({{ today }});
 
 window.vm = new AppViewModel();
 window.vm.eventList(eventListInDB);
@@ -200,6 +208,10 @@ $.colorbox.settings.close = 'Exit';
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
 		    window.vm.addCompletedEvent(data['name'],data['time']);
+		    console.log("today = " + data['today'])
+		    console.log("total = " + data['total'])
+		    $('#totalAchieve').text(data['total']);
+		    $('#todayAchieve').text(data['today']);
 		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}

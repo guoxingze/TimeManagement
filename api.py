@@ -22,6 +22,7 @@ import time
 from datetime import datetime
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
+from google.appengine.ext.db import stats
 
 class Event(db.Model):
     name = db.StringProperty(required=True)
@@ -29,6 +30,28 @@ class Event(db.Model):
 class CompletedTomato(db.Model):
     name = db.StringProperty(required=True)
     time = db.StringProperty(required=False)
+    date = db.StringProperty(required=False)
+
+def read_achieve_today():
+    """
+    read today's achievements count
+    """
+    today_date = str(datetime.now().strftime('%Y-%m-%d'))
+    # query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE time LIKE '%s'" % today_date)
+    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE date = :1", today_date)
+    results = query.count()
+    logging.info("count = %s" % query.count())
+    return results
+
+def read_achieve_total():
+    """
+    read total achievements count
+    """
+    query = db.GqlQuery(r"SELECT name FROM CompletedTomato")
+    results = query.count()
+    logging.info("count = %s" % query.count())
+    return results
+
 
 
 class CompletedEventHandler(webapp2.RequestHandler):
@@ -41,6 +64,8 @@ class CompletedEventHandler(webapp2.RequestHandler):
     def post(self):
         logging.info(self.request.body)
 
+        today_achieve = read_achieve_today()
+        total_achieve = read_achieve_total()
         data = json.loads(self.request.body)
         eventName = data['eventName']
 
@@ -48,12 +73,24 @@ class CompletedEventHandler(webapp2.RequestHandler):
             eventName = "No Event Name"
 
 # TODO change time zone
-        completedEvent = CompletedTomato(name=eventName,time=str(datetime.now().strftime('%Y-%m-%d %H:%M')))
+        completedTime = str(datetime.now().strftime('%Y-%m-%d %H:%M'))
+        completedDate = str(datetime.now().strftime('%Y-%m-%d'))
+        completedEvent = CompletedTomato(name = eventName,
+                                         time = completedTime,
+                                         date = completedDate)
         completedEvent.put()
-        self.response.out.write(json.dumps(({'name': completedEvent.name,'time':completedEvent.time})))
+
+        today_achieve += 1
+        total_achieve += 1
+        self.response.out.write(json.dumps(({'name': completedEvent.name,'time':completedEvent.time,
+                                            'total':total_achieve,'today':today_achieve})))
 
 
-class save_event_handler(webapp2.RequestHandler):
+        # test
+        # logging.info("today = %s " % read_today())
+        # logging.info("total = %s " % read_total())
+
+class SaveEventHandler(webapp2.RequestHandler):
     """
     save event to to do list
     """
@@ -74,7 +111,8 @@ class save_event_handler(webapp2.RequestHandler):
         self.response.out.write(json.dumps(({'story': 42})))
 
 
-class delete_event_handler(webapp2.RequestHandler):
+
+class DeleteEventHandler(webapp2.RequestHandler):
     """
     delete event from to do list
     """
@@ -97,7 +135,7 @@ class delete_event_handler(webapp2.RequestHandler):
         self.response.out.write(json.dumps(({'story': 42})))
 
 app = webapp2.WSGIApplication([
-    webapp2.Route('/api/save', save_event_handler, name='login'),
-    webapp2.Route('/api/delete', delete_event_handler, name='login'),
+    webapp2.Route('/api/save', SaveEventHandler, name='login'),
+    webapp2.Route('/api/delete', DeleteEventHandler, name='login'),
     webapp2.Route('/api/complete', CompletedEventHandler, name='login'),
 ], debug=True)

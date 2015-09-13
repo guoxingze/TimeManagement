@@ -3,21 +3,86 @@
 <html>
 <head>
 	<title>Timer</title>
+	<meta content="text/html; charset=utf-8" http-equiv="content-type">
+		<meta name="description" content="Centering grid content" />
+		<meta name="keywords" content="javascript, dynamic, grid, layout, jquery plugin, flex layouts"/>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
 	<script src="../js/flipclock.js"></script>
 	<script src="../js/knockout.js"></script>
 	<script src="../js/jquery.colorbox.js"></script>
+	<script src="../js/freewall.js"></script>
+	<script src="../js/centering.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="../css/flipclock.css">
 	<link rel="stylesheet" href="../css/colorbox.css" />
+	<link rel="stylesheet" href="../css/freewall.css" />
 	<!-- Knockout foreach binding http://knockoutjs.com/documentation/foreach-binding.html -->
 	<!-- Clock: http://flipclockjs.com/ -->
+
+	
 </head>
 <body>
+
+<div class='header'>
+			<div class="clearfix">
+				<div class="float-left">
+						<h1><a href="http://vnjs.net/www/project/freewall/">Time Manager</a></h1>
+						<div class='target'>Help you enjoy your work.</div>
+				</div>
+			</div>
+		</div>
+		<div id="freewall" class="free-wall">
+			<div class="brick size23 clockBrick"> 
+				<div id="clockBLock">
+					<div class="clock" style="margin:2em;"></div>
+			 		<div class="message"></div>
+			 		<button onclick="setTimer(5)" style="float:right; margin-right:10px">Start Timer</button>
+				</div>
+			</div>	
+			<div class="brick size43 todoBrick">
+				<div>
+						<div class="listBar" style='margin-top:20px;margin-bottom: 10px; margin-left:50px'>
+							<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
+							<button data-bind="click: addToDoEvent, enable:newEventName().length>0">New Todo</button>
+						</div>
+				
+					<div id="toDoList" class="listDiv">
+						
+						<ul data-bind="foreach: eventList" class="list" id="sortable">
+						  <li class="ui-state-default">
+						  	<div class="eventNameSpan" data-bind="text: name" style="float:left; width:10%"></div>
+						  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%"></input></div>
+						  	<!-- <div><button data-bind="click: $parent.removeSelected" style="float:left">Remove</button></div> -->
+						  	<button data-bind="click: $parent.removeSelected" style="border: 0; background: transparent">
+   								<img src="css/images/remove.png" width="20" height="20" alt="submit" />
+							</button>
+						  </li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="brick size43 achieveBrick">
+				<div style="width:560px">
+					<div class="listBar" style='margin-top:20px;margin-bottom: 10px; margin-left:50px'>
+						<span>Today: <span id="todayAchieve"></span></span>
+						<span>Total: <span id="totalAchieve"></span></span>
+					</div>
+						<div id="achieveList" class="listDiv">
+							<ul data-bind="foreach: completedList" class="list" id="sortable">
+							  <li class="ui-state-default">
+							  	<div data-bind="text: name" style="float:left"></div>
+							  	<div class="completedTime" data-bind="text: time"></div>
+							  </li>
+							</ul>
+						</div>
+				</div>
+			</div>
+		</div>
+
+<div>
 <p>Hello "{{ userName }}"</p>
-<!-- <p>Hello "{{ eventList }}"</p> -->
-	<button onclick="showCompleteBox()">Test show</button>
 <!-- Event add/edit -->
 	<div style="display:none">
 		<div id="completedColorBox" class="allColorBox">
@@ -28,70 +93,38 @@
 		</div>
 	</div>
 
-	<div class="clock" style="margin:2em;"></div>
-	<div class="message"></div>
-	<button onclick="setTimer(5)">testTimer</button>
-
-<!-- 
-<div id="confirmColorBox">
-
-	<p>Do you want to save this tomato</p>
-	<button onclick="saveTomato()">Save</button>
-	<button>Cancel</button>
-</div>
- -->
-
-
-<div id="newEventDiv" style='margin-top:20px'>
-	<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
-	<button data-bind="click: addToDoEvent, enable:newEventName().length>0">Add</button>
 </div>
 
-
-<!-- <table> -->
-	<!-- <tr> -->
-		<!-- <td> -->
-		
-	<div id="toDoList" class="listDiv" style="height: 200px;overflow: auto">
-		<ul data-bind="foreach: eventList" class="list" id="sortable">
-		  <li class="ui-state-default">
-		  	<div class="eventNameSpan" data-bind="text: name" style="float:left; width:10%"></div>
-		  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%"></input></div>
-		  	<div><button data-bind="click: $parent.removeSelected" style="float:left">Remove</button></div>
-		  </li>
-		</ul>
-	</div>
-
-<!-- </td> -->
-
-
-<!-- <input type="radio" value="Gamma" data-bind="checked: radioSelectedOptionValue" />Gamma -->
-
-		<!-- <td> -->
-	<div style="width:560px">
-		<p>
-		<span style="float:right">Total<span id="totalAchieve"></span></span>
-		<span style="float:right">Today<span id="todayAchieve"></span></span>
-		</p>
-			<div id="toDoList" class="listDiv" style="height: 200px;overflow: auto">
-				<ul data-bind="foreach: completedList" class="list" id="sortable">
-				  <li class="ui-state-default">
-				  	<div data-bind="text: name" style="float:left"></div>
-				  	<div class="completedTime" data-bind="text: time"></div>
-				  </li>
-				</ul>
-			</div>
-	</div>
-		<!-- </td> -->
-	<!-- </tr> -->
-
-
-<!-- </table> -->
-
-
-
-</body>
 <script type="text/javascript">
+
+$('.flip-clock-label').hide()
+/////////////////////////////
+
+
+			$(function() {
+				var wall = new Freewall("#freewall");
+				wall.reset({
+					selector: '.brick',
+					animate: true,
+					cellW: 160,
+					cellH: 160,
+					delay: 50,
+					onResize: function() {
+						wall.fitWidth();
+					}
+				});
+				wall.fitWidth();
+				
+				var temp = '<div class="brick {size}" style="background-color: {color}"><div class="cover"></div></div>';
+				var size = "size23 size22 size21 size13 size12 size11".split(" ");
+				$(".add-more").click(function() {
+					var	html = temp.replace('{size}', size[size.length * Math.random() << 0])
+									.replace('{color}', colour[colour.length * Math.random() << 0]);
+					wall.prepend(html);
+				});
+			});
+
+// ///////////////////////////////
 
 var workingEvent = "";
 //set event list
@@ -262,28 +295,55 @@ $.colorbox.settings.close = 'Exit';
 		$.colorbox.close();
 	}
 </script>
+</body>
 </html>
 {% endautoescape %}
 
 
 <style>
-  .list { list-style-type: none; margin: 0; padding: 0; width: 100%; }
-  .list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
-  .list li span { position: absolute; margin-left: -1.3em; }
+	.list { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+	.list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+	.list li span { position: absolute; margin-left: -1.3em; }
 
-  .listDiv{
-  	width: 550px;
-  	background-color: #f4f4f4;
-  	padding:10px;
-  }
+	.clockBrick{
+		background-color: rgb(39, 174, 96)
+	}
+	.todoBrick{
+		background-color: rgb(41, 128, 185)
+	}
+	.achieveBrick{
+		background-color: rgb(211, 84, 0)
+	}
 
-  .eventCheck{
-  	margin-left:300px;
-  }
 
-  .completedTime{
-  	margin-left:300px !important;
-  }
+	#toDoList{
+		background-color: rgb(41, 128, 185)
+	}
+	#achieveList{
+		background-color: rgb(211, 84, 0)
+	}
+
+	.listDiv{
+		width: 550px;
+		height: 405px;
+
+		margin-left: 50px;
+		background-color: #f4f4f4;
+		overflow: auto; 
+
+	}
+
+  	.eventCheck{
+  		margin-left:300px;
+ 	 }
+
+  	.completedTime{
+  		margin-left:300px !important;
+  	}
+
+  	.free-wall {
+		margin: 15px;
+ 	 }
 
 /* .eventNameSpan{
  	display: inline-block;

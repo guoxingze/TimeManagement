@@ -405,8 +405,8 @@ var FlipClock;
 				dots = '';	
 			}
 
-			label = this.factory.localize(label);
-
+			// label = this.factory.localize(label);
+			label = ""
 			var html = [
 				'<span class="'+this.factory.classes.divider+' '+(css ? css : '').toLowerCase()+'">',
 					'<span class="'+this.factory.classes.label+'">'+(label ? label : '')+'</span>',

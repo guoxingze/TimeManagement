@@ -17,5 +17,48 @@ indexes:
 
 - kind: CompletedTomato
   properties:
-  - name: time
+  - name: date
+  - name: user
   - name: name
+
+- kind: CompletedTomato
+  properties:
+  - name: time
+    direction: desc
+  - name: name
+  - name: date
+  - name: user
+
+- kind: CompletedTomato
+  properties:
+  - name: user
+  - name: date
+
+- kind: CompletedTomato
+  properties:
+  - name: user
+  - name: name
+
+- kind: CompletedTomato
+  properties:
+  - name: user
+  - name: time
+
+- kind: CompletedTomato
+  properties:
+  - name: user
+  - name: time
+    direction: desc
+
+- kind: Event
+  properties:
+  - name: name
+  - name: user
+  - name: time
+    direction: desc
+
+- kind: Event
+  properties:
+  - name: user
+  - name: time
+    direction: desc

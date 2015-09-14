@@ -25,14 +25,34 @@
 </head>
 <body>
 
-<div class='header'>
+		<div class='header'>
 			<div class="clearfix">
-				<div class="float-left">
-						<h1><a href="http://vnjs.net/www/project/freewall/">Time Manager</a></h1>
-						<div class='target'>Help you enjoy your work.</div>
-				</div>
+				<!-- <table> -->
+				<!-- <tr> -->
+					<!-- <td style="width:50%"> -->
+						<div class="float-left">
+							<h1><a class="headerLink">Time Manager</a></h1>
+							<span class='target'>Help you enjoy your work.</span>
+						</div>
+					<!-- </td> -->
+					<!-- <td style="width:50%"> -->
+					<div style="margin-top: 52px;float:right">
+						<ul class="headerList">
+							<li>
+								<span>Hello {{ userName }}</span>
+							</li>
+							<li>
+								<span><a href={{logout}}>Logout</a></span>
+							</li>
+						</ul>							
+					</div>
+					<!-- </td> -->
+				<!-- </tr> -->
+		<!-- </table> -->
+
 			</div>
 		</div>
+		
 		<div id="freewall" class="free-wall">
 			<div class="brick size23 clockBrick"> 
 				<div id="clockBLock">
@@ -44,7 +64,7 @@
 			<div class="brick size43 todoBrick">
 				<div>
 						<div class="listBar" style='margin-top:20px;margin-bottom: 10px; margin-left:50px'>
-							<input type="text" data-bind="textInput:newEventName" id="newEventName"></input>
+							<input type="text" data-bind="textInput:newEventName" id="newEventName" onkeypress="enterInput(event)"></input>
 							<button data-bind="click: addToDoEvent, enable:newEventName().length>0">New Todo</button>
 						</div>
 				
@@ -53,7 +73,7 @@
 						<ul data-bind="foreach: eventList" class="list" id="sortable">
 						  <li class="ui-state-default">
 						  	<div class="eventNameSpan" data-bind="text: name" style="float:left; width:10%"></div>
-						  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%"></input></div>
+						  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%" onclick="checkEvent(this)"></input></div>
 						  	<!-- <div><button data-bind="click: $parent.removeSelected" style="float:left">Remove</button></div> -->
 						  	<button data-bind="click: $parent.removeSelected" style="border: 0; background: transparent">
    								<img src="css/images/remove.png" width="20" height="20" alt="submit" />
@@ -87,8 +107,10 @@
 	<div style="display:none">
 		<div id="completedColorBox" class="allColorBox">
 			<p>Completed!</p>
-			<input type="text" id="completeEventName"/>
-			<button class="saveColorbox" onclick="saveInColorBox()">Save Completed</button>
+			<span class="red">*<span>
+			<input type="text" data-bind="textInput:completeEventName" id="completeEventName"></input>
+			<button data-bind="click: saveInColorBox, enable:completeEventName().length>0">New Todo</button>
+			<!-- <button class="saveColorbox" onclick="saveInColorBox()">Save Completed</button> -->
 
 		</div>
 	</div>
@@ -97,7 +119,7 @@
 
 <script type="text/javascript">
 
-$('.flip-clock-label').hide()
+$('.flip-clock-label').hide();
 /////////////////////////////
 
 
@@ -114,14 +136,6 @@ $('.flip-clock-label').hide()
 					}
 				});
 				wall.fitWidth();
-				
-				var temp = '<div class="brick {size}" style="background-color: {color}"><div class="cover"></div></div>';
-				var size = "size23 size22 size21 size13 size12 size11".split(" ");
-				$(".add-more").click(function() {
-					var	html = temp.replace('{size}', size[size.length * Math.random() << 0])
-									.replace('{color}', colour[colour.length * Math.random() << 0]);
-					wall.prepend(html);
-				});
 			});
 
 // ///////////////////////////////
@@ -130,8 +144,8 @@ var workingEvent = "";
 //set event list
 var eventListInDB = {{eventList}};
 var completedListInDB = {{completedList}};
-$('#totalAchieve').text({{ total }});
-$('#todayAchieve').text({{ today }});
+$('#totalAchieve').text(0);
+$('#todayAchieve').text(0);
 
 window.vm = new AppViewModel();
 window.vm.eventList(eventListInDB);
@@ -146,20 +160,50 @@ console.log("eventListInDB = " + eventListInDB)
 
 
 //bind onclick for event list
-$('.eventCheck').click(function(){
+
+
+/*$('.eventCheck').click(function(){
 	$('.eventCheck').not(this).each(function(){
          $(this).attr('checked', false);
      });
-	workingEvent = this.value
+	// console.log("~~~~~~"+this.checked)
+	if(this.checked){
+		workingEvent = this.value
+	}else{
+		workingEvent = ""
+	}
 	console.log('value = ' + workingEvent)
 
-})
+})*/
 
+//onchange method for event checkbox
+
+function enterInput(event){
+
+      if(event.keyCode==13){
+		window.vm.addToDoEvent();
+	}
+}
+
+function checkEvent(element){
+	$('.eventCheck').not(element).each(function(){
+         $(this).attr('checked', false);
+     });
+	// console.log("~~~~~~"+this.checked)
+	if(element.checked){
+		workingEvent = element.value
+	}else{
+		workingEvent = ""
+	}
+	console.log('value = ' + workingEvent)
+
+}
 function AppViewModel() {
     var self = this;
-    self.newEventName= ko.observable("test");
+    self.newEventName= ko.observable("");
     self.eventList = ko.observableArray([]);
     self.completedList = ko.observableArray([]);
+    self.completeEventName = ko.observable("");
     self.checkEvent = function(){
     	console.log("test check")
     }
@@ -170,14 +214,16 @@ function AppViewModel() {
     self.addToDoEvent = function() {
     	var newEventName = $("#newEventName").val();
         saveNewEvent(newEventName);
-        self.eventList.push({ name: newEventName });
+        // self.eventList.push({ name: newEventName });
+        self.eventList.splice(0,0,{ name: newEventName });
         // $("#newEventName").val('');
         self.newEventName("");
     };
 
     self.addCompletedEvent = function(name,time) {
     	console.log('test addCompletedEvent')
-        self.completedList.push({ name: name,time:time});
+        // self.completedList.push({ name: name,time:time});
+        self.completedList.splice(0,0,{ name: name,time:time});
         // $("#newEventName").val('');
         self.newEventName("");
     };
@@ -190,6 +236,16 @@ function AppViewModel() {
     self.selectEvent = function() {
 		console.log("input = " + input)
     };
+
+    self.saveInColorBox = function(){
+    	console.log("save completed event");
+		var completeEventName = $('#completeEventName').val()
+		completeTomato(completeEventName);
+		$.colorbox.close();
+		self.completeEventName("");
+    }
+
+
     console.log("size of newEventName = " + newEventName.length);
 }
 
@@ -220,7 +276,25 @@ $.colorbox.settings.close = 'Exit';
 	        }
 	    });
 
+		updateAchieve();
 	});
+
+	function updateAchieve(){
+		console.log("update achieve");
+		$.ajax({
+		  type: "POST",
+		  url: "../api/update_achieve",
+		  dataType: 'json',
+		  data: JSON.stringify({"time":getCurrentDate()})
+		})
+		.done(function( data ) { // check why I use done
+		    console.log("today = " + data['today'])
+		    console.log("total = " + data['total'])
+		    $('#totalAchieve').text(data['total']);
+		    $('#todayAchieve').text(data['today']);
+		    // $('.voteCount').text(data['story']['vote_count']);
+		});
+	}
 
 	function setTimer(time){
 		 clock.setTime(time);
@@ -231,12 +305,12 @@ $.colorbox.settings.close = 'Exit';
 		$('#confirmColorBox').show();
 		// alert("test")
 
-		console.log("enter completeTomato");
+		console.log(getCurrentDate());
 		$.ajax({
 		  type: "POST",
 		  url: "../api/complete",
 		  dataType: 'json',
-		  data: JSON.stringify({ "eventName": completedTomato})
+		  data: JSON.stringify({ "eventName": completedTomato, "time":getCurrentDate()})
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
@@ -255,7 +329,7 @@ $.colorbox.settings.close = 'Exit';
 		  type: "POST",
 		  url: "../api/save",
 		  dataType: 'json',
-		  data: JSON.stringify({ "eventName": newEventName})
+		  data: JSON.stringify({ "eventName": newEventName, "time":getCurrentDate()})
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
@@ -278,22 +352,52 @@ $.colorbox.settings.close = 'Exit';
 		});
 	}
 
-	function saveTomato(){
-		console.log('test 2')
-	}
 
 	function showCompleteBox(){
+		window.vm.completeEventName("");
 		console.log("show completed color box");
+		window.vm.completeEventName(workingEvent);
 		$.colorbox({inline:true, width:"50%",height:"50%", overlayClose: false, href:"#completedColorBox"});
-		$("#completeEventName").val(workingEvent);
+		// $("#completeEventName").val(workingEvent);
 	}
 
-	function saveInColorBox(){
+	function getCurrentDate(){
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var hh = today.getHours();
+		var min = today.getMinutes();
+		var yyyy = today.getFullYear();
+		var ss = today.getSeconds();
+
+		if(dd<10){
+		    dd='0'+dd
+		} 
+		if(mm<10){
+		    mm='0'+mm
+		} 
+
+		if(hh<10){
+		    hh='0'+hh
+		}
+
+		if(min<10){
+		    min='0'+min
+		} 
+
+		if(ss<10){
+		    ss='0'+ss
+		} 
+
+		var result = yyyy +'-' + mm +'-'+ dd +' ' + hh + ':' + min + ':' + ss;
+		return result
+	}
+/*	function saveInColorBox(){
 		console.log("save completed event");
 		var completeEventName = $('#completeEventName').val()
 		completeTomato(completeEventName);
 		$.colorbox.close();
-	}
+	}*/
 </script>
 </body>
 </html>
@@ -345,6 +449,17 @@ $.colorbox.settings.close = 'Exit';
 		margin: 15px;
  	 }
 
+	.header li{
+		display: inline;
+	}
+
+	.header li:before {
+		content: " | ";
+	}
+
+	.header li:first-child:before {
+		content: none;
+	}
 /* .eventNameSpan{
  	display: inline-block;
  }*/

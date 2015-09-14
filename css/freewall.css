@@ -124,12 +124,12 @@ table {
 	padding-left: 2%;
 }
 
-.header a {
+.header .headerLink {
 	font-size: 35px;
 	color: white;
 	display: block;
 }
-.header a:first-letter {
+.header .headerLink:first-letter {
 	font-size: 60px;
 	line-height: 40px;
 	font-weight: bold;

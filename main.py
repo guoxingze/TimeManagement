@@ -21,7 +21,7 @@ import api
 import json
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
-
+from google.appengine.api import users
 
 
 # # serialize datastore model to JSON format
@@ -33,17 +33,6 @@ from google.appengine.ext import db
 #       d = db.to_dict(p)
 #       itemsList.append(d)
 #     return  json.dumps(itemsList)
-
-
-class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        # self.response.write('Hello world!')
-        logging.info('test init get')
-        template_values = {
-            'userName':'test'
-        }
-        path = os.path.join(os.path.dirname(__file__), 'view', 'home.html')
-        self.response.out.write(template.render(path, template_values))
 
 class LoginHandler(webapp2.RequestHandler):
     def post(self):
@@ -71,29 +60,38 @@ class LoginHandler(webapp2.RequestHandler):
 class TimerHandler(webapp2.RequestHandler):
 
     def get(self):
-        logging.info('test timer get')
-        # self.response.write('Hello world!')
-        eventQuery = db.GqlQuery("SELECT * FROM Event")
-        # eventList = query.fetch(2)
-        eventList = list(db.to_dict(event) for event in eventQuery.run())
-        eventList2 = json.dumps(eventList)
 
-        completedQuery = db.GqlQuery("SELECT * FROM CompletedTomato")
-        # eventList = query.fetch(2)
-        completedList = list(db.to_dict(CompletedTomato) for CompletedTomato in completedQuery.run())
-        completedList2 = json.dumps(completedList)
+        # check user login information
+        user = users.get_current_user()
+        if user:
+            user_name = user.nickname()
+            logout_url = users.create_logout_url('/')
+            # uid = str(user.user_id())
+        else:
+            self.redirect(users.create_login_url(self.request.uri))
 
-        logging.info(len(eventList))
+        event_query = db.GqlQuery(r"SELECT * FROM Event WHERE user = :1 ORDER BY time DESC", str(user_name))
+        event_list = list(db.to_dict(event) for event in event_query.run())
+        event_list_json = json.dumps(event_list)
 
-        today_achieve = api.read_achieve_today()
-        total_achieve = api.read_achieve_total()
-        logging.info("today_achieve = %s" % today_achieve)
+        completed_query = db.GqlQuery(r"SELECT * FROM CompletedTomato WHERE user = :1 ORDER BY time DESC", str(user_name))
+        # completed_query.get().order('date')
+        completed_list = list(db.to_dict(CompletedTomato) for CompletedTomato in completed_query.run())
+        completed_list_json = json.dumps(completed_list)
+
+
+
+        logging.info(user.user_id)
+        # today_achieve = api.read_achieve_today(date)
+        # total_achieve = api.read_achieve_total()
+        
         template_values = {
-            'userName':'test',
-            'eventList':eventList2,
-            'completedList':completedList2,
-            'today':today_achieve,
-            'total':total_achieve
+            'userName':user_name,
+            'eventList':event_list_json,
+            'completedList':completed_list_json,
+            # 'today':today_achieve,
+            # 'total':total_achieve,
+            'logout':logout_url
             # 'eventList':eventList
         }
         path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')
@@ -101,7 +99,6 @@ class TimerHandler(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    webapp2.Route('/login', LoginHandler, name='login'),
+    ('/', TimerHandler),
     webapp2.Route('/timer', TimerHandler, name='timer'),
 ], debug=True)

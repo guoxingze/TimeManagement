@@ -23,22 +23,28 @@ from datetime import datetime
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.ext.db import stats
+from google.appengine.api import users
+
 
 class Event(db.Model):
     name = db.StringProperty(required=True)
+    user = db.StringProperty(required=True)
+    time = db.StringProperty(required=False)
 
 class CompletedTomato(db.Model):
     name = db.StringProperty(required=True)
     time = db.StringProperty(required=False)
     date = db.StringProperty(required=False)
+    user = db.StringProperty(required=True)
 
-def read_achieve_today():
+def read_achieve_today(date):
     """
     read today's achievements count
     """
-    today_date = str(datetime.now().strftime('%Y-%m-%d'))
+    # today_date = str(datetime.now().strftime('%Y-%m-%d'))
     # query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE time LIKE '%s'" % today_date)
-    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE date = :1", today_date)
+    uid = users.get_current_user().nickname()
+    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE date = :1 and user = :2", date,uid)
     results = query.count()
     logging.info("count = %s" % query.count())
     return results
@@ -47,7 +53,8 @@ def read_achieve_total():
     """
     read total achievements count
     """
-    query = db.GqlQuery(r"SELECT name FROM CompletedTomato")
+    uid = users.get_current_user().nickname()
+    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE user = :1",uid)
     results = query.count()
     logging.info("count = %s" % query.count())
     return results
@@ -64,31 +71,31 @@ class CompletedEventHandler(webapp2.RequestHandler):
     def post(self):
         logging.info(self.request.body)
 
-        today_achieve = read_achieve_today()
-        total_achieve = read_achieve_total()
         data = json.loads(self.request.body)
-        eventName = data['eventName']
+        event_name = data['eventName']
+        current_time = data['time']
 
-        if eventName == "":
-            eventName = "No Event Name"
+# read the achievements before compplete event
+        today_achieve = read_achieve_today(current_time[:10])
+        total_achieve = read_achieve_total()
 
-# TODO change time zone
-        completedTime = str(datetime.now().strftime('%Y-%m-%d %H:%M'))
-        completedDate = str(datetime.now().strftime('%Y-%m-%d'))
-        completedEvent = CompletedTomato(name = eventName,
-                                         time = completedTime,
-                                         date = completedDate)
-        completedEvent.put()
+        if event_name == "":
+            event_name = "No Event Name"
+
+
+        uid = users.get_current_user().nickname()
+        completed_event = CompletedTomato(name = event_name,
+                                         time = current_time[:16],
+                                         date = current_time[:10],  #only input yyyy-mm-dd into db date field
+                                         user = uid)
+        completed_event.put()
 
         today_achieve += 1
         total_achieve += 1
-        self.response.out.write(json.dumps(({'name': completedEvent.name,'time':completedEvent.time,
+        self.response.out.write(json.dumps(({'name': completed_event.name,'time':completed_event.time,
                                             'total':total_achieve,'today':today_achieve})))
 
 
-        # test
-        # logging.info("today = %s " % read_today())
-        # logging.info("total = %s " % read_total())
 
 class SaveEventHandler(webapp2.RequestHandler):
     """
@@ -102,8 +109,9 @@ class SaveEventHandler(webapp2.RequestHandler):
 
         data = json.loads(self.request.body)
         eventName = data['eventName']
-
-        event = Event(name=eventName)
+        current_time = data['time']
+        uid = users.get_current_user().nickname()
+        event = Event(name=eventName,user=uid,time=current_time)
         event.put()
         # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
         # logging.info(query)
@@ -134,8 +142,26 @@ class DeleteEventHandler(webapp2.RequestHandler):
 
         self.response.out.write(json.dumps(({'story': 42})))
 
+class UpdateAchieveHandler(webapp2.RequestHandler):
+    """
+    read current achievenment and return to front end
+    """
+
+    def post(self):
+        logging.info(self.request.body)
+
+        data = json.loads(self.request.body)
+        current_time = data['time']
+        logging.info("current date = %s" % current_time)
+
+        today_achieve = read_achieve_today(current_time[:10])
+        total_achieve = read_achieve_total()
+
+        self.response.out.write(json.dumps(({'today': today_achieve,'total': total_achieve})))
+
 app = webapp2.WSGIApplication([
-    webapp2.Route('/api/save', SaveEventHandler, name='login'),
-    webapp2.Route('/api/delete', DeleteEventHandler, name='login'),
-    webapp2.Route('/api/complete', CompletedEventHandler, name='login'),
+    webapp2.Route('/api/save', SaveEventHandler, name='save'),
+    webapp2.Route('/api/delete', DeleteEventHandler, name='delete'),
+    webapp2.Route('/api/complete', CompletedEventHandler, name='complete'),
+    webapp2.Route('/api/update_achieve', UpdateAchieveHandler, name='update_achieve'),
 ], debug=True)

@@ -58,7 +58,8 @@
 				<div id="clockBLock">
 					<div class="clock" style="margin:2em;"></div>
 			 		<div class="message"></div>
-			 		<button onclick="setTimer(5)" style="float:right; margin-right:10px">Start Timer</button>
+			 		<button id='stopClock' onclick="dropWork()" disabled="true" style="float:right; margin-right:10px">Stop</button>
+			 		<button id='startClock' onclick="setTimer(5)" style="float:right; margin-right:10px">Start</button>
 				</div>
 			</div>	
 			<div class="brick size43 todoBrick">
@@ -101,21 +102,25 @@
 			</div>
 		</div>
 
-<div>
-<p>Hello "{{ userName }}"</p>
-<!-- Event add/edit -->
+<!-- Completed Event Colorbox -->
+
+
 	<div style="display:none">
 		<div id="completedColorBox" class="allColorBox">
-			<p>Completed!</p>
+			<p class="black">Completed!</p>
 			<span class="red">*<span>
 			<input type="text" data-bind="textInput:completeEventName" id="completeEventName"></input>
-			<button data-bind="click: saveInColorBox, enable:completeEventName().length>0">New Todo</button>
-			<!-- <button class="saveColorbox" onclick="saveInColorBox()">Save Completed</button> -->
+			<button data-bind="click: saveInColorBox, enable:completeEventName().length>0">Add to Achievement</button>
+		</div>
 
+		<div id="dropEventColorBox" class="allColorBox">
+			<p class="black">You are currently in working, do you really want to exit?</p>
+			<button onclick="stopTimer()">Yes</button>
+			<button onclick="continueWorking()">No</button>
 		</div>
 	</div>
 
-</div>
+
 
 <script type="text/javascript">
 
@@ -141,6 +146,7 @@ $('.flip-clock-label').hide();
 // ///////////////////////////////
 
 var workingEvent = "";
+var ifStopClock = false;
 //set event list
 var eventListInDB = {{eventList}};
 var completedListInDB = {{completedList}};
@@ -157,24 +163,6 @@ for (var i = 0; i<eventListInDB.length; i++) {
 	console.log("name " + i + " = " + eventListInDB[i].name)
 };
 console.log("eventListInDB = " + eventListInDB)
-
-
-//bind onclick for event list
-
-
-/*$('.eventCheck').click(function(){
-	$('.eventCheck').not(this).each(function(){
-         $(this).attr('checked', false);
-     });
-	// console.log("~~~~~~"+this.checked)
-	if(this.checked){
-		workingEvent = this.value
-	}else{
-		workingEvent = ""
-	}
-	console.log('value = ' + workingEvent)
-
-})*/
 
 //onchange method for event checkbox
 
@@ -207,9 +195,7 @@ function AppViewModel() {
     self.checkEvent = function(){
     	console.log("test check")
     }
-    self.testFunction = function(){
-    	console.log("test function 1")
-    }
+
 
     self.addToDoEvent = function() {
     	var newEventName = $("#newEventName").val();
@@ -268,10 +254,14 @@ $.colorbox.settings.close = 'Exit';
 	        countdown: true,
 	        callbacks: {
 	        	stop: function() {
-	        		// $('.message').html('The clock has stopped!');
-	        		// completeTomato(workingEvent);
-	        		showCompleteBox();
-	        		window.vm.testFunction();
+	        		if(!ifStopClock){
+	        			showCompleteBox();
+	        			disableStop();
+	        			enableStart();
+	        		}
+	        		//reset stop flag
+	        		ifStopClock = false;
+
 	        	}
 	        }
 	    });
@@ -296,16 +286,49 @@ $.colorbox.settings.close = 'Exit';
 		});
 	}
 
+	function disableStop(){
+		$("#stopClock").prop('disabled', true);
+	}
+
+	function enableStop(){
+		$("#stopClock").prop('disabled', false);
+	}
+
+	function disableStart(){
+		$("#startClock").prop('disabled', true);
+	}
+
+	function enableStart(){
+		$("#startClock").prop('disabled', false);
+	}
+
+
+
+
 	function setTimer(time){
 		 clock.setTime(time);
 		 clock.start();
+		 enableStop();
+		 disableStart();
 	}
 
-	function completeTomato(completedTomato){
-		$('#confirmColorBox').show();
-		// alert("test")
+	function stopTimer(){
+		ifStopClock = true;
+		clock.reset();
+		$.colorbox.close();
+	}
 
-		console.log(getCurrentDate());
+	function continueWorking(){
+		$.colorbox.close();
+		clock.start();
+		enableStop();
+		disableStart();
+	}
+	function dropWork(){
+		clock.stop();
+		showStopBox();
+	}
+	function completeTomato(completedTomato){
 		$.ajax({
 		  type: "POST",
 		  url: "../api/complete",
@@ -357,9 +380,15 @@ $.colorbox.settings.close = 'Exit';
 		window.vm.completeEventName("");
 		console.log("show completed color box");
 		window.vm.completeEventName(workingEvent);
-		$.colorbox({inline:true, width:"50%",height:"50%", overlayClose: false, href:"#completedColorBox"});
+		$.colorbox({inline:true, width:"450px",height:"155px", overlayClose: false, href:"#completedColorBox"});
 		// $("#completeEventName").val(workingEvent);
 	}
+
+	function showStopBox(){
+		$.colorbox({inline:true, width:"450px",height:"155px", overlayClose: false, href:"#dropEventColorBox"});
+	}
+
+
 
 	function getCurrentDate(){
 		var today = new Date();
@@ -459,6 +488,14 @@ $.colorbox.settings.close = 'Exit';
 
 	.header li:first-child:before {
 		content: none;
+	}
+
+	.black{
+		color:black;
+	}
+
+	.red{
+		color:red;
 	}
 /* .eventNameSpan{
  	display: inline-block;

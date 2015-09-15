@@ -25,13 +25,14 @@ from google.appengine.ext import db
 from google.appengine.ext.db import stats
 from google.appengine.api import users
 
-
+# Event talbe in DB
 class Event(db.Model):
     name = db.StringProperty(required=True)
     user = db.StringProperty(required=True)
     time = db.StringProperty(required=False)
 
-class CompletedTomato(db.Model):
+# CompletedEvent talbe in DB
+class CompletedEvent(db.Model):
     name = db.StringProperty(required=True)
     time = db.StringProperty(required=False)
     date = db.StringProperty(required=False)
@@ -42,9 +43,9 @@ def read_achieve_today(date):
     read today's achievements count
     """
     # today_date = str(datetime.now().strftime('%Y-%m-%d'))
-    # query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE time LIKE '%s'" % today_date)
+    # query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE time LIKE '%s'" % today_date)
     uid = users.get_current_user().nickname()
-    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE date = :1 and user = :2", date,uid)
+    query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE date = :1 and user = :2", date, uid)
     results = query.count()
     logging.info("count = %s" % query.count())
     return results
@@ -54,7 +55,7 @@ def read_achieve_total():
     read total achievements count
     """
     uid = users.get_current_user().nickname()
-    query = db.GqlQuery(r"SELECT name FROM CompletedTomato WHERE user = :1",uid)
+    query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE user = :1", uid)
     results = query.count()
     logging.info("count = %s" % query.count())
     return results
@@ -84,9 +85,9 @@ class CompletedEventHandler(webapp2.RequestHandler):
 
 
         uid = users.get_current_user().nickname()
-        completed_event = CompletedTomato(name = event_name,
-                                         time = current_time[:16],
-                                         date = current_time[:10],  #only input yyyy-mm-dd into db date field
+        completed_event = CompletedEvent(name = event_name, 
+                                         time = current_time[:16], 
+                                         date = current_time[:10],   #only input yyyy-mm-dd into db date field
                                          user = uid)
         completed_event.put()
 
@@ -108,10 +109,10 @@ class SaveEventHandler(webapp2.RequestHandler):
         logging.info(self.request.body)
 
         data = json.loads(self.request.body)
-        eventName = data['eventName']
+        event_name = data['eventName']
         current_time = data['time']
         uid = users.get_current_user().nickname()
-        event = Event(name=eventName,user=uid,time=current_time)
+        event = Event(name=event_name, user=uid, time=current_time)
         event.put()
         # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
         # logging.info(query)
@@ -131,12 +132,12 @@ class DeleteEventHandler(webapp2.RequestHandler):
         logging.info(self.request.body)
 
         data = json.loads(self.request.body)
-        eventName = data['eventName']
-        logging.info("delete event name = %s" % eventName)
+        event_name = data['eventName']
+        logging.info("delete event name = %s" % event_name)
 
 
-        logging.info(r"SELECT * FROM Event WHERE name = '%s'" % eventName)
-        query = db.GqlQuery(r"SELECT * FROM Event WHERE name = '%s'" % eventName)
+        logging.info(r"SELECT * FROM Event WHERE name = '%s'" % event_name)
+        query = db.GqlQuery(r"SELECT * FROM Event WHERE name = '%s'" % event_name)
         results = query.fetch(1)
         db.delete(results)
 
@@ -157,7 +158,7 @@ class UpdateAchieveHandler(webapp2.RequestHandler):
         today_achieve = read_achieve_today(current_time[:10])
         total_achieve = read_achieve_total()
 
-        self.response.out.write(json.dumps(({'today': today_achieve,'total': total_achieve})))
+        self.response.out.write(json.dumps(({'today': today_achieve, 'total': total_achieve})))
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/api/save', SaveEventHandler, name='save'),

@@ -24,15 +24,6 @@ from google.appengine.ext import db
 from google.appengine.api import users
 
 
-# # serialize datastore model to JSON format
-# def serialize(model):
-
-#    allInstances = model.all() # fetching every instance of model
-#    itemsList = [] #initial empty list
-#    for p in allInstances:
-#       d = db.to_dict(p)
-#       itemsList.append(d)
-#     return  json.dumps(itemsList)
 
 class LoginHandler(webapp2.RequestHandler):
     def post(self):

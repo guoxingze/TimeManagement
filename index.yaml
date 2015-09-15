@@ -10,18 +10,18 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: date
   - name: name
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: date
   - name: user
   - name: name
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: time
     direction: desc
@@ -29,22 +29,22 @@ indexes:
   - name: date
   - name: user
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: user
   - name: date
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: user
   - name: name
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: user
   - name: time
 
-- kind: CompletedTomato
+- kind: CompletedEvent
   properties:
   - name: user
   - name: time

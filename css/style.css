@@ -1,0 +1,96 @@
+
+	.list { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+	.list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+	.list li span { position: absolute; margin-left: -1.3em; }
+
+	.clockBrick{
+		background-color: rgb(39, 174, 96)
+	}
+	.todoBrick{
+		background-color: rgb(41, 128, 185)
+	}
+	.achieveBrick{
+		background-color: rgb(211, 84, 0)
+	}
+
+
+	#toDoList{
+		background-color: rgb(41, 128, 185)
+	}
+	#achieveList{
+		background-color: rgb(211, 84, 0)
+	}
+
+	.listDiv{
+		width: 550px;
+		height: 405px;
+
+		margin-left: 50px;
+		background-color: #f4f4f4;
+		overflow: auto; 
+
+	}
+
+  	.eventCheck{
+  		margin-left:300px;
+ 	 }
+
+  	.completedTime{
+  		margin-left:300px !important;
+  	}
+
+  	.free-wall {
+		margin: 15px;
+ 	 }
+
+	.header li{
+		display: inline;
+	}
+
+	.header li:before {
+		content: " | ";
+	}
+
+	.header li:first-child:before {
+		content: none;
+	}
+
+	.black{
+		color:black;
+	}
+
+	.red{
+		color:red;
+	}
+
+	#userInfor{
+		margin-top: 52px;
+		float:right
+	}
+
+	.float_right{
+		float:right;
+	}
+
+	.float_left{
+		float:left;
+	}
+
+	.width10{
+		width = 10%;
+	}
+	.margin_right{
+		margin-right:10px;
+	}
+
+	.listBanner{
+		margin-top:20px;
+		margin-bottom: 10px; 
+		margin-left:50px;
+	}
+
+	.image_button{
+		border: 0;
+		background: transparent;
+	}
+

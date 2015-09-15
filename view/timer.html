@@ -14,10 +14,12 @@
 	<script src="../js/jquery.colorbox.js"></script>
 	<script src="../js/freewall.js"></script>
 	<script src="../js/centering.js"></script>
+	<script src="../js/timer.js"></script>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="../css/flipclock.css">
 	<link rel="stylesheet" href="../css/colorbox.css" />
 	<link rel="stylesheet" href="../css/freewall.css" />
+	<link rel="stylesheet" href="../css/style.css" />
 	<!-- Knockout foreach binding http://knockoutjs.com/documentation/foreach-binding.html -->
 	<!-- Clock: http://flipclockjs.com/ -->
 
@@ -25,85 +27,80 @@
 </head>
 <body>
 
-		<div class='header'>
-			<div class="clearfix">
-				<!-- <table> -->
-				<!-- <tr> -->
-					<!-- <td style="width:50%"> -->
-						<div class="float-left">
-							<h1><a class="headerLink">Time Manager</a></h1>
-							<span class='target'>Help you enjoy your work.</span>
-						</div>
-					<!-- </td> -->
-					<!-- <td style="width:50%"> -->
-					<div style="margin-top: 52px;float:right">
-						<ul class="headerList">
-							<li>
-								<span>Hello {{ userName }}</span>
-							</li>
-							<li>
-								<span><a href={{logout}}>Logout</a></span>
-							</li>
-						</ul>							
-					</div>
-					<!-- </td> -->
-				<!-- </tr> -->
-		<!-- </table> -->
+	<div class='header'>
+		<div class="clearfix">
+			<div class="float-left">
+				<h1><a class="headerLink">Time Manager</a></h1>
+				<span class='target'>Help you enjoy your work.</span>
+			</div>
+
+			<div id='userInfor'>
+				<ul class="headerList">
+					<li>
+						<span>Hello {{ userName }}</span>
+					</li>
+					<li>
+						<span><a href={{logout}}>Logout</a></span>
+					</li>
+				</ul>							
+			</div>
+
+		</div>
+	</div>
+		
+	<div id="freewall" class="free-wall">
+		<div class="brick size23 clockBrick"> 
+			<div id="clockBLock">
+				<div class="clock" style="margin:2em;"></div>
+		 		<div class="message"></div>
+		 		<button class="float_right margin_right" id='stopClock' onclick="dropWork()" disabled="true">Stop</button>
+		 		<button class="float_right margin_right" id='startClock' onclick="setTimer(5)">Start</button>
+			</div>
+		</div>	
+
+		<div class="brick size43 todoBrick">
+			<div>
+				<div class="listBanner">
+					<input type="text" data-bind="textInput:newEventName" id="newEventName" onkeypress="enterInput(event)"></input>
+					<button data-bind="click: addToDoEvent, enable:newEventName().length>0">New Todo</button>
+				</div>
+			
+				<div id="toDoList" class="listDiv">
+					<ul data-bind="foreach: eventList" class="list" id="sortable">
+					  <li class="ui-state-default">
+					  	<div class="eventNameSpan float_left width10" data-bind="text: name"></div>
+					  	<div><input class="eventCheck float_left width10" type="checkbox" data-bind="value: name" onclick="checkEvent(this)"></input></div>
+					  	<button class="image_button" data-bind="click: $parent.removeSelected">
+								<img src="css/images/remove.png" width="20" height="20" alt="submit" />
+						</button>
+					  </li>
+					</ul>
+				</div>
 
 			</div>
 		</div>
-		
-		<div id="freewall" class="free-wall">
-			<div class="brick size23 clockBrick"> 
-				<div id="clockBLock">
-					<div class="clock" style="margin:2em;"></div>
-			 		<div class="message"></div>
-			 		<button id='stopClock' onclick="dropWork()" disabled="true" style="float:right; margin-right:10px">Stop</button>
-			 		<button id='startClock' onclick="setTimer(5)" style="float:right; margin-right:10px">Start</button>
+
+		<div class="brick size43 achieveBrick">
+			<div>
+				<div class="listBanner">
+					<span>Today: <span id="todayAchieve"></span></span>
+					<span>Total: <span id="totalAchieve"></span></span>
 				</div>
-			</div>	
-			<div class="brick size43 todoBrick">
-				<div>
-						<div class="listBar" style='margin-top:20px;margin-bottom: 10px; margin-left:50px'>
-							<input type="text" data-bind="textInput:newEventName" id="newEventName" onkeypress="enterInput(event)"></input>
-							<button data-bind="click: addToDoEvent, enable:newEventName().length>0">New Todo</button>
-						</div>
 				
-					<div id="toDoList" class="listDiv">
-						
-						<ul data-bind="foreach: eventList" class="list" id="sortable">
-						  <li class="ui-state-default">
-						  	<div class="eventNameSpan" data-bind="text: name" style="float:left; width:10%"></div>
-						  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" style="float:left;width:10%" onclick="checkEvent(this)"></input></div>
-						  	<!-- <div><button data-bind="click: $parent.removeSelected" style="float:left">Remove</button></div> -->
-						  	<button data-bind="click: $parent.removeSelected" style="border: 0; background: transparent">
-   								<img src="css/images/remove.png" width="20" height="20" alt="submit" />
-							</button>
-						  </li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="brick size43 achieveBrick">
-				<div style="width:560px">
-					<div class="listBar" style='margin-top:20px;margin-bottom: 10px; margin-left:50px'>
-						<span>Today: <span id="todayAchieve"></span></span>
-						<span>Total: <span id="totalAchieve"></span></span>
-					</div>
-						<div id="achieveList" class="listDiv">
-							<ul data-bind="foreach: completedList" class="list" id="sortable">
-							  <li class="ui-state-default">
-							  	<div data-bind="text: name" style="float:left"></div>
-							  	<div class="completedTime" data-bind="text: time"></div>
-							  </li>
-							</ul>
-						</div>
+				<div id="achieveList" class="listDiv">
+					<ul data-bind="foreach: completedList" class="list" id="sortable">
+					  <li class="ui-state-default">
+					  	<div class="float_left" data-bind="text: name"></div>
+					  	<div class="completedTime" data-bind="text: time"></div>
+					  </li>
+					</ul>
 				</div>
 			</div>
 		</div>
+	</div>
+
 
 <!-- Completed Event Colorbox -->
-
 
 	<div style="display:none">
 		<div id="completedColorBox" class="allColorBox">
@@ -122,382 +119,17 @@
 
 
 
-<script type="text/javascript">
+	<script type="text/javascript">
+		//set event list
+		var eventListInDB = {{eventList}};
+		var completedListInDB = {{completedList}};
 
-$('.flip-clock-label').hide();
-/////////////////////////////
-
-
-			$(function() {
-				var wall = new Freewall("#freewall");
-				wall.reset({
-					selector: '.brick',
-					animate: true,
-					cellW: 160,
-					cellH: 160,
-					delay: 50,
-					onResize: function() {
-						wall.fitWidth();
-					}
-				});
-				wall.fitWidth();
-			});
-
-// ///////////////////////////////
-
-var workingEvent = "";
-var ifStopClock = false;
-//set event list
-var eventListInDB = {{eventList}};
-var completedListInDB = {{completedList}};
-$('#totalAchieve').text(0);
-$('#todayAchieve').text(0);
-
-window.vm = new AppViewModel();
-window.vm.eventList(eventListInDB);
-window.vm.completedList(completedListInDB);
-ko.applyBindings(vm);
-
-for (var i = 0; i<eventListInDB.length; i++) {
-	console.log("event " + i + " = " + eventListInDB[i])
-	console.log("name " + i + " = " + eventListInDB[i].name)
-};
-console.log("eventListInDB = " + eventListInDB)
-
-//onchange method for event checkbox
-
-function enterInput(event){
-
-      if(event.keyCode==13){
-		window.vm.addToDoEvent();
-	}
-}
-
-function checkEvent(element){
-	$('.eventCheck').not(element).each(function(){
-         $(this).attr('checked', false);
-     });
-	// console.log("~~~~~~"+this.checked)
-	if(element.checked){
-		workingEvent = element.value
-	}else{
-		workingEvent = ""
-	}
-	console.log('value = ' + workingEvent)
-
-}
-function AppViewModel() {
-    var self = this;
-    self.newEventName= ko.observable("");
-    self.eventList = ko.observableArray([]);
-    self.completedList = ko.observableArray([]);
-    self.completeEventName = ko.observable("");
-    self.checkEvent = function(){
-    	console.log("test check")
-    }
-
-
-    self.addToDoEvent = function() {
-    	var newEventName = $("#newEventName").val();
-        saveNewEvent(newEventName);
-        // self.eventList.push({ name: newEventName });
-        self.eventList.splice(0,0,{ name: newEventName });
-        // $("#newEventName").val('');
-        self.newEventName("");
-    };
-
-    self.addCompletedEvent = function(name,time) {
-    	console.log('test addCompletedEvent')
-        // self.completedList.push({ name: name,time:time});
-        self.completedList.splice(0,0,{ name: name,time:time});
-        // $("#newEventName").val('');
-        self.newEventName("");
-    };
-
-    self.removeSelected = function(input) {
-    	self.eventList.remove(input)
-    	deleteNewEvent(input['name'])
-    };
-
-    self.selectEvent = function() {
-		console.log("input = " + input)
-    };
-
-    self.saveInColorBox = function(){
-    	console.log("save completed event");
-		var completeEventName = $('#completeEventName').val()
-		completeTomato(completeEventName);
-		$.colorbox.close();
-		self.completeEventName("");
-    }
-
-
-    console.log("size of newEventName = " + newEventName.length);
-}
-
-
-// ko.applyBindings(new AppViewModel());
-
-
-	var clock;
-	$(document).ready(function() {
-//set color box
-$.colorbox.settings.close = 'Exit';
-// $("#eventCbox, #eventCbox1, #eventCbox1").colorbox({inline:true, width:"50%", overlayClose: false});
-//color box done
-	$("#sortable" ).sortable();
-    $("#sortable" ).disableSelection();
-
-	console.log("Test");
-		clock = $('.clock').FlipClock(0, {
-	        clockFace: 'MinuteCounter',
-	        countdown: true,
-	        callbacks: {
-	        	stop: function() {
-	        		if(!ifStopClock){
-	        			showCompleteBox();
-	        			disableStop();
-	        			enableStart();
-	        		}
-	        		//reset stop flag
-	        		ifStopClock = false;
-
-	        	}
-	        }
-	    });
-
-		updateAchieve();
-	});
-
-	function updateAchieve(){
-		console.log("update achieve");
-		$.ajax({
-		  type: "POST",
-		  url: "../api/update_achieve",
-		  dataType: 'json',
-		  data: JSON.stringify({"time":getCurrentDate()})
-		})
-		.done(function( data ) { // check why I use done
-		    console.log("today = " + data['today'])
-		    console.log("total = " + data['total'])
-		    $('#totalAchieve').text(data['total']);
-		    $('#todayAchieve').text(data['today']);
-		    // $('.voteCount').text(data['story']['vote_count']);
-		});
-	}
-
-	function disableStop(){
-		$("#stopClock").prop('disabled', true);
-	}
-
-	function enableStop(){
-		$("#stopClock").prop('disabled', false);
-	}
-
-	function disableStart(){
-		$("#startClock").prop('disabled', true);
-	}
-
-	function enableStart(){
-		$("#startClock").prop('disabled', false);
-	}
-
-
-
-
-	function setTimer(time){
-		 clock.setTime(time);
-		 clock.start();
-		 enableStop();
-		 disableStart();
-	}
-
-	function stopTimer(){
-		ifStopClock = true;
-		clock.reset();
-		$.colorbox.close();
-	}
-
-	function continueWorking(){
-		$.colorbox.close();
-		clock.start();
-		enableStop();
-		disableStart();
-	}
-	function dropWork(){
-		clock.stop();
-		showStopBox();
-	}
-	function completeTomato(completedTomato){
-		$.ajax({
-		  type: "POST",
-		  url: "../api/complete",
-		  dataType: 'json',
-		  data: JSON.stringify({ "eventName": completedTomato, "time":getCurrentDate()})
-		})
-		.done(function( data ) { // check why I use done
-		    console.log( "event added");
-		    window.vm.addCompletedEvent(data['name'],data['time']);
-		    console.log("today = " + data['today'])
-		    console.log("total = " + data['total'])
-		    $('#totalAchieve').text(data['total']);
-		    $('#todayAchieve').text(data['today']);
-		    // $('.voteCount').text(data['story']['vote_count']);
-		});
-	}
-
-	function saveNewEvent(newEventName){
-		console.log("enter ajax test");
-		$.ajax({
-		  type: "POST",
-		  url: "../api/save",
-		  dataType: 'json',
-		  data: JSON.stringify({ "eventName": newEventName, "time":getCurrentDate()})
-		})
-		.done(function( data ) { // check why I use done
-		    console.log( "event added");
-		    // $('.voteCount').text(data['story']['vote_count']);
-		});
-	}
-
-	function deleteNewEvent(eventName){
-		console.log("enter ajax test");
-		console.log("deleted eventName = " + eventName);
-		$.ajax({
-		  type: "POST",
-		  url: "../api/delete",
-		  dataType: 'json',
-		  data: JSON.stringify({ "eventName": eventName})
-		})
-		.done(function( data ) { // check why I use done
-		    console.log( "event deleted");
-		    // $('.voteCount').text(data['story']['vote_count']);
-		});
-	}
-
-
-	function showCompleteBox(){
-		window.vm.completeEventName("");
-		console.log("show completed color box");
-		window.vm.completeEventName(workingEvent);
-		$.colorbox({inline:true, width:"450px",height:"155px", overlayClose: false, href:"#completedColorBox"});
-		// $("#completeEventName").val(workingEvent);
-	}
-
-	function showStopBox(){
-		$.colorbox({inline:true, width:"450px",height:"155px", overlayClose: false, href:"#dropEventColorBox"});
-	}
-
-
-
-	function getCurrentDate(){
-		var today = new Date();
-		var dd = today.getDate();
-		var mm = today.getMonth()+1; //January is 0!
-		var hh = today.getHours();
-		var min = today.getMinutes();
-		var yyyy = today.getFullYear();
-		var ss = today.getSeconds();
-
-		if(dd<10){
-		    dd='0'+dd
-		} 
-		if(mm<10){
-		    mm='0'+mm
-		} 
-
-		if(hh<10){
-		    hh='0'+hh
-		}
-
-		if(min<10){
-		    min='0'+min
-		} 
-
-		if(ss<10){
-		    ss='0'+ss
-		} 
-
-		var result = yyyy +'-' + mm +'-'+ dd +' ' + hh + ':' + min + ':' + ss;
-		return result
-	}
-/*	function saveInColorBox(){
-		console.log("save completed event");
-		var completeEventName = $('#completeEventName').val()
-		completeTomato(completeEventName);
-		$.colorbox.close();
-	}*/
-</script>
+		//initial knockout.js
+		window.vm = new AppViewModel();
+		window.vm.eventList(eventListInDB);
+		window.vm.completedList(completedListInDB);
+		ko.applyBindings(vm);
+	</script>
 </body>
 </html>
 {% endautoescape %}
-
-
-<style>
-	.list { list-style-type: none; margin: 0; padding: 0; width: 100%; }
-	.list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
-	.list li span { position: absolute; margin-left: -1.3em; }
-
-	.clockBrick{
-		background-color: rgb(39, 174, 96)
-	}
-	.todoBrick{
-		background-color: rgb(41, 128, 185)
-	}
-	.achieveBrick{
-		background-color: rgb(211, 84, 0)
-	}
-
-
-	#toDoList{
-		background-color: rgb(41, 128, 185)
-	}
-	#achieveList{
-		background-color: rgb(211, 84, 0)
-	}
-
-	.listDiv{
-		width: 550px;
-		height: 405px;
-
-		margin-left: 50px;
-		background-color: #f4f4f4;
-		overflow: auto; 
-
-	}
-
-  	.eventCheck{
-  		margin-left:300px;
- 	 }
-
-  	.completedTime{
-  		margin-left:300px !important;
-  	}
-
-  	.free-wall {
-		margin: 15px;
- 	 }
-
-	.header li{
-		display: inline;
-	}
-
-	.header li:before {
-		content: " | ";
-	}
-
-	.header li:first-child:before {
-		content: none;
-	}
-
-	.black{
-		color:black;
-	}
-
-	.red{
-		color:red;
-	}
-/* .eventNameSpan{
- 	display: inline-block;
- }*/
-</style>

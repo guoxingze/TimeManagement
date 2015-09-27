@@ -19,6 +19,7 @@ import os
 import logging
 import api
 import json
+import database
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -75,7 +76,7 @@ class TimerHandler(webapp2.RequestHandler):
         if_user_exit = user_query.count()
 
         if if_user_exit == 0:
-            user_db = api.UsersHistory(name=user_name, tutorial=True)
+            user_db = database.UsersHistory(name=user_name, tutorial=True)
             user_db.put()
 
         read_tutorial = user_query_list[0]['tutorial']

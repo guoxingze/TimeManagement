@@ -54,7 +54,7 @@
 				<div class="clock" style="margin:2em;"></div>
 		 		<div class="message"></div>
 		 		<button class="float_right margin_right" id='stopClock' onclick="dropWork()" disabled="true">Stop</button>
-		 		<button class="float_right margin_right" id='startClock' onclick="setTimer(3)">Start</button>
+		 		<button class="float_right margin_right" id='startClock' onclick="setTimer(1200)">Start</button>
 			</div>
 		</div>	
 
@@ -129,37 +129,7 @@
 		//set event list
 		var eventListInDB = {{eventList}};
 		var completedListInDB = {{completedList}};
-		var readTutorial = "{{readTutorial}}";
-		console.log("readTutorial = " + readTutorial)
-		if(readTutorial == 'True'){
-			console.log("completedListInDB = " + completedListInDB)
-			showHelp()
-		}
-
-		function switchTutorial(){
-			// console.log($('#tutorialCheck').prop('checked'))
-			if($('#tutorialCheck').prop('checked')){
-				updateIfViewTutorial(false)
-			}else{
-				updateIfViewTutorial(true)				
-			}
-		}
-
-		function showHelp(){
-			$.colorbox({inline:true, width:"1700",height:"600px", overlayClose: false, href:"#tutorialColorBox"});
-		}
-		function updateIfViewTutorial(ifView){
-			$.ajax({
-			  type: "PUT",
-			  url: "../api/update_tutorial",
-			  dataType: 'json',
-			  data: JSON.stringify({"ifView":ifView})
-			})
-			.done(function( data ) { // check why I use done
-			    console.log("today = " + data['today'])
-			});
-		}
-
+		
 
 		//initial knockout.js
 		window.vm = new AppViewModel();

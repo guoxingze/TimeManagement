@@ -19,29 +19,14 @@ import os
 import logging
 import json
 import time
+import database
 from datetime import datetime
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.ext.db import stats
 from google.appengine.api import users
 
-# Event talbe in DB
-class Event(db.Model):
-    name = db.StringProperty(required=True)
-    user = db.StringProperty(required=True)
-    time = db.StringProperty(required=False)
 
-# CompletedEvent talbe in DB
-class CompletedEvent(db.Model):
-    name = db.StringProperty(required=True)
-    time = db.StringProperty(required=False)
-    date = db.StringProperty(required=False)
-    user = db.StringProperty(required=True)
-
-# User DB
-class UsersHistory(db.Model):
-    name = db.StringProperty(required=True)
-    tutorial = db.BooleanProperty(required=True)
 
 def read_achieve_today(date):
     """
@@ -65,39 +50,30 @@ def read_achieve_total():
     logging.info("count = %s" % query.count())
     return results
 
-class update_tutorial(webapp2.RequestHandler):
+class UpdateTutorial(webapp2.RequestHandler):
     """
     update if view tutorial to user DB
     """
 
     def put(self):
+        """
+        update tutorial in user db
+        """
         data = json.loads(self.request.body)
         if_view = data['ifView']
-        logging.info("if_view = %s" %if_view)
 
         uid = users.get_current_user().nickname()
         user_query = db.GqlQuery(r"SELECT * FROM UsersHistory WHERE name = :1", str(uid))
-        user_query_list = list(db.to_dict(User) for User in user_query.run())
-        # user_query_list_json = json.dumps(user_query_list)
+
         record = user_query[0]
         record.tutorial = if_view
-        logging.info(user_query)
-        logging.info(user_query[0].name)
         record.put()
-        # logging.debug(record)
-        # record.tutorial = if_view
-        # This updates it
-        # record.put()
-
 
 
 class CompletedEventHandler(webapp2.RequestHandler):
     """
-    Save completed event to DB
+    cinoketed event handler
     """
-    def get(self):
-        logging.info('test completed_event_handler get')
-
     def post(self):
         logging.info(self.request.body)
 
@@ -112,9 +88,9 @@ class CompletedEventHandler(webapp2.RequestHandler):
         if event_name == "":
             event_name = "No Event Name"
 
-
+# get user name
         uid = users.get_current_user().nickname()
-        completed_event = CompletedEvent(name = event_name, 
+        completed_event = database.CompletedEvent(name = event_name, 
                                          time = current_time[:16], 
                                          date = current_time[:10],   #only input yyyy-mm-dd into db date field
                                          user = uid)
@@ -131,46 +107,38 @@ class SaveEventHandler(webapp2.RequestHandler):
     """
     save event to to do list
     """
-    def get(self):
-        logging.info('test save get')
 
     def post(self):
+        """
+        Create and dave a new event
+        """
         logging.info(self.request.body)
 
         data = json.loads(self.request.body)
         event_name = data['eventName']
         current_time = data['time']
         uid = users.get_current_user().nickname()
-        event = Event(name=event_name, user=uid, time=current_time)
+        event = database.Event(name=event_name, user=uid, time=current_time)
         event.put()
-        # query = db.GqlQuery("SELECT * FROM Pet WHERE weight_in_pounds < 39")
-        # logging.info(query)
-        # logging.info(query.fetch(0))
-        self.response.out.write(json.dumps(({'story': 42})))
 
-
+        self.response.out.write(json.dumps(({'success': True})))
 
 class DeleteEventHandler(webapp2.RequestHandler):
-    """
-    delete event from to do list
-    """
-    def get(self):
-        logging.info('test save get')
 
-    def post(self):
+    def put(self):
+        """
+        Delete event
+        """
         logging.info(self.request.body)
 
         data = json.loads(self.request.body)
         event_name = data['eventName']
-        logging.info("delete event name = %s" % event_name)
 
-
-        logging.info(r"SELECT * FROM Event WHERE name = '%s'" % event_name)
         query = db.GqlQuery(r"SELECT * FROM Event WHERE name = '%s'" % event_name)
         results = query.fetch(1)
         db.delete(results)
 
-        self.response.out.write(json.dumps(({'story': 42})))
+        self.response.out.write(json.dumps(({'success': True})))
 
 class UpdateAchieveHandler(webapp2.RequestHandler):
     """
@@ -194,5 +162,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/api/delete', DeleteEventHandler, name='delete'),
     webapp2.Route('/api/complete', CompletedEventHandler, name='complete'),
     webapp2.Route('/api/update_achieve', UpdateAchieveHandler, name='update_achieve'),
-    webapp2.Route('/api/update_tutorial', update_tutorial, name='update_tutorial'),
+    webapp2.Route('/api/UpdateTutorial', UpdateTutorial, name='UpdateTutorial'),
 ], debug=True)

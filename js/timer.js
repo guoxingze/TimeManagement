@@ -2,9 +2,15 @@
 	var workingEvent = "";
 	var ifStopClock = false;
 	var clock;
+	var readTutorial = "{{readTutorial}}";
 	$('#totalAchieve').text(0);
 	$('#todayAchieve').text(0);
 
+
+	if(readTutorial == 'True'){
+		console.log("completedListInDB = " + completedListInDB)
+		showHelp()
+	}
 
 	$(document).ready(function() {
 		//set color box
@@ -214,10 +220,8 @@ function AppViewModel() {
 	}
 
 	function deleteNewEvent(eventName){
-		console.log("enter ajax test");
-		console.log("deleted eventName = " + eventName);
 		$.ajax({
-		  type: "POST",
+		  type: "PUT",
 		  url: "../api/delete",
 		  dataType: 'json',
 		  data: JSON.stringify({ "eventName": eventName})
@@ -273,4 +277,29 @@ function AppViewModel() {
 
 		var result = yyyy +'-' + mm +'-'+ dd +' ' + hh + ':' + min + ':' + ss;
 		return result
+	}
+
+
+	function switchTutorial(){
+		// console.log($('#tutorialCheck').prop('checked'))
+		if($('#tutorialCheck').prop('checked')){
+			updateIfViewTutorial(false)
+		}else{
+			updateIfViewTutorial(true)				
+		}
+	}
+
+	function showHelp(){
+		$.colorbox({inline:true, width:"1600",height:"600px", overlayClose: false, href:"#tutorialColorBox"});
+	}
+	function updateIfViewTutorial(ifView){
+		$.ajax({
+		  type: "PUT",
+		  url: "../api/update_tutorial",
+		  dataType: 'json',
+		  data: JSON.stringify({"ifView":ifView})
+		})
+		.done(function( data ) { // check why I use done
+		    console.log("today = " + data['today'])
+		});
 	}

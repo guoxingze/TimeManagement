@@ -254,7 +254,12 @@ table {
 }
 
 .size23 {
-	width: 320px;
+	width: 380px;
+	height: 480px;
+}
+
+.size43 {
+	width: 615px;
 	height: 480px;
 }
 
@@ -278,10 +283,7 @@ table {
 	height: 640px;
 }
 
-.size43 {
-	width: 640px;
-	height: 480px;
-}
+
 
 .size35 {
 	width: 480px;

@@ -9,9 +9,6 @@
 	$(document).ready(function() {
 		//set color box
 		$.colorbox.settings.close = 'Exit';
-		
-		$("#sortable" ).disableSelection();
-	    $("#sortable" ).disableSelection();
 
 	    //initial clock
 		clock = $('.clock').FlipClock(0, {

@@ -32,7 +32,9 @@
 	}
 
   	.eventCheck{
-  		margin-left:300px;
+  		/*margin-left:300px;*/
+  		float:left;
+  		width: 10%;
  	 }
 
   	.completedTime{
@@ -55,7 +57,7 @@
 		content: none;
 	}
 
-	.black{
+	.textInColorBox{
 		color:black;
 	}
 
@@ -76,9 +78,7 @@
 		float:left;
 	}
 
-	.width10{
-		width = 10%;
-	}
+
 	.margin_right{
 		margin-right:10px;
 	}
@@ -94,3 +94,18 @@
 		background: transparent;
 	}
 
+	.eventNameSpan{
+		width:80%;
+		float:left;
+	}
+
+	.event_li{
+		border: 1px solid #d3d3d3;
+		background: #e6e6e6 url("css/images/list_background.png") 50% 50% repeat-x;
+		font-weight: normal;
+		color: #555555;
+}
+
+	#completeEventName{
+		width: 60%
+	}

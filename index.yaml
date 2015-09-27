@@ -62,3 +62,18 @@ indexes:
   - name: user
   - name: time
     direction: desc
+
+- kind: User
+  properties:
+  - name: name
+  - name: tutorial
+
+- kind: User
+  properties:
+  - name: user
+  - name: tutorial
+
+- kind: UsersHistory
+  properties:
+  - name: name
+  - name: tutorial

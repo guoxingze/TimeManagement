@@ -38,6 +38,11 @@ class CompletedEvent(db.Model):
     date = db.StringProperty(required=False)
     user = db.StringProperty(required=True)
 
+# User DB
+class UsersHistory(db.Model):
+    name = db.StringProperty(required=True)
+    tutorial = db.BooleanProperty(required=True)
+
 def read_achieve_today(date):
     """
     read today's achievements count
@@ -59,6 +64,30 @@ def read_achieve_total():
     results = query.count()
     logging.info("count = %s" % query.count())
     return results
+
+class update_tutorial(webapp2.RequestHandler):
+    """
+    update if view tutorial to user DB
+    """
+
+    def put(self):
+        data = json.loads(self.request.body)
+        if_view = data['ifView']
+        logging.info("if_view = %s" %if_view)
+
+        uid = users.get_current_user().nickname()
+        user_query = db.GqlQuery(r"SELECT * FROM UsersHistory WHERE name = :1", str(uid))
+        user_query_list = list(db.to_dict(User) for User in user_query.run())
+        # user_query_list_json = json.dumps(user_query_list)
+        record = user_query[0]
+        record.tutorial = if_view
+        logging.info(user_query)
+        logging.info(user_query[0].name)
+        record.put()
+        # logging.debug(record)
+        # record.tutorial = if_view
+        # This updates it
+        # record.put()
 
 
 
@@ -165,4 +194,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/api/delete', DeleteEventHandler, name='delete'),
     webapp2.Route('/api/complete', CompletedEventHandler, name='complete'),
     webapp2.Route('/api/update_achieve', UpdateAchieveHandler, name='update_achieve'),
+    webapp2.Route('/api/update_tutorial', update_tutorial, name='update_tutorial'),
 ], debug=True)

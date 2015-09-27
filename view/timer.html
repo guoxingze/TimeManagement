@@ -4,18 +4,15 @@
 <head>
 	<title>Timer</title>
 	<meta content="text/html; charset=utf-8" http-equiv="content-type">
-		<meta name="description" content="Centering grid content" />
-		<meta name="keywords" content="javascript, dynamic, grid, layout, jquery plugin, flex layouts"/>
+		<meta name="description" content="Timer" />
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
 	<script src="../js/flipclock.js"></script>
 	<script src="../js/knockout.js"></script>
 	<script src="../js/jquery.colorbox.js"></script>
 	<script src="../js/freewall.js"></script>
 	<script src="../js/centering.js"></script>
 	<script src="../js/timer.js"></script>
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="../css/flipclock.css">
 	<link rel="stylesheet" href="../css/colorbox.css" />
 	<link rel="stylesheet" href="../css/freewall.css" />
@@ -40,6 +37,9 @@
 						<span>Hello {{ userName }}</span>
 					</li>
 					<li>
+						<span><a href="#" onclick="showHelp()">Help</a></span>
+					</li>
+					<li>
 						<span><a href={{logout}}>Logout</a></span>
 					</li>
 				</ul>							
@@ -54,7 +54,7 @@
 				<div class="clock" style="margin:2em;"></div>
 		 		<div class="message"></div>
 		 		<button class="float_right margin_right" id='stopClock' onclick="dropWork()" disabled="true">Stop</button>
-		 		<button class="float_right margin_right" id='startClock' onclick="setTimer(5)">Start</button>
+		 		<button class="float_right margin_right" id='startClock' onclick="setTimer(3)">Start</button>
 			</div>
 		</div>	
 
@@ -66,10 +66,10 @@
 				</div>
 			
 				<div id="toDoList" class="listDiv">
-					<ul data-bind="foreach: eventList" class="list" id="sortable">
-					  <li class="ui-state-default">
-					  	<div class="eventNameSpan float_left width10" data-bind="text: name"></div>
-					  	<div><input class="eventCheck float_left width10" type="checkbox" data-bind="value: name" onclick="checkEvent(this)"></input></div>
+					<ul data-bind="foreach: eventList" class="list">
+					  <li class="event_li">
+					  	<div class="eventNameSpan" data-bind="text: name"></div>
+					  	<div><input class="eventCheck" type="checkbox" data-bind="value: name" onclick="checkEvent(this)"></input></div>
 					  	<button class="image_button" data-bind="click: $parent.removeSelected">
 								<img src="css/images/remove.png" width="20" height="20" alt="submit" />
 						</button>
@@ -88,8 +88,8 @@
 				</div>
 				
 				<div id="achieveList" class="listDiv">
-					<ul data-bind="foreach: completedList" class="list" id="sortable">
-					  <li class="ui-state-default">
+					<ul data-bind="foreach: completedList" class="list">
+					  <li class="event_li">
 					  	<div class="float_left" data-bind="text: name"></div>
 					  	<div class="completedTime" data-bind="text: time"></div>
 					  </li>
@@ -100,29 +100,66 @@
 	</div>
 
 
-<!-- Completed Event Colorbox -->
+
 
 	<div style="display:none">
+	<!-- Completed Event Colorbox -->
 		<div id="completedColorBox" class="allColorBox">
-			<p class="black">Completed!</p>
+			<p class="textInColorBox">Completed!</p>
 			<span class="red">*<span>
 			<input type="text" data-bind="textInput:completeEventName" id="completeEventName"></input>
 			<button data-bind="click: saveInColorBox, enable:completeEventName().length>0">Add to Achievement</button>
 		</div>
 
+	<!-- Stop timer Colorbox -->
 		<div id="dropEventColorBox" class="allColorBox">
-			<p class="black">You are currently in working, do you really want to exit?</p>
+			<p class="textInColorBox">You are currently in working, do you really want to exit?</p>
 			<button onclick="stopTimer()">Yes</button>
 			<button onclick="continueWorking()">No</button>
 		</div>
+	
+	<!-- Tutorial Event Colorbox -->
+		<div id="tutorialColorBox" class="allColorBox">
+			<div><img src="css/images/tutorial1.png" width="1405" height="489" alt="submit" /></div>
+			<input type="checkbox" id='tutorialCheck' onchange="switchTutorial()"><span class="textInColorBox">Do not show this message again</span></input>
+		</div>
 	</div>
-
-
 
 	<script type="text/javascript">
 		//set event list
 		var eventListInDB = {{eventList}};
 		var completedListInDB = {{completedList}};
+		var readTutorial = "{{readTutorial}}";
+		console.log("readTutorial = " + readTutorial)
+		if(readTutorial == 'True'){
+			console.log("completedListInDB = " + completedListInDB)
+			showHelp()
+		}
+
+		function switchTutorial(){
+			// console.log($('#tutorialCheck').prop('checked'))
+			if($('#tutorialCheck').prop('checked')){
+				updateIfViewTutorial(false)
+			}else{
+				updateIfViewTutorial(true)				
+			}
+		}
+
+		function showHelp(){
+			$.colorbox({inline:true, width:"1700",height:"600px", overlayClose: false, href:"#tutorialColorBox"});
+		}
+		function updateIfViewTutorial(ifView){
+			$.ajax({
+			  type: "PUT",
+			  url: "../api/update_tutorial",
+			  dataType: 'json',
+			  data: JSON.stringify({"ifView":ifView})
+			})
+			.done(function( data ) { // check why I use done
+			    console.log("today = " + data['today'])
+			});
+		}
+
 
 		//initial knockout.js
 		window.vm = new AppViewModel();

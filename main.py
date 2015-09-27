@@ -65,12 +65,24 @@ class TimerHandler(webapp2.RequestHandler):
         event_list = list(db.to_dict(event) for event in event_query.run())
         event_list_json = json.dumps(event_list)
 
-        completed_query = db.GqlQuery(r"SELECT * FROM CompletedTomato WHERE user = :1 ORDER BY time DESC", str(user_name))
-        # completed_query.get().order('date')
-        completed_list = list(db.to_dict(CompletedTomato) for CompletedTomato in completed_query.run())
+        completed_query = db.GqlQuery(r"SELECT * FROM CompletedEvent WHERE user = :1 ORDER BY time DESC", str(user_name))
+        completed_list = list(db.to_dict(CompletedEvent) for CompletedEvent in completed_query.run())
         completed_list_json = json.dumps(completed_list)
 
+        user_query = db.GqlQuery(r"SELECT tutorial FROM UsersHistory WHERE name = :1", str(user_name))
+        user_query_list = list(db.to_dict(User) for User in user_query.run())
+        user_query_list_json = json.dumps(user_query_list)
+        if_user_exit = user_query.count()
 
+        if if_user_exit == 0:
+            user_db = api.UsersHistory(name=user_name, tutorial=True)
+            user_db.put()
+
+        read_tutorial = user_query_list[0]['tutorial']
+        logging.info("user name = %s" %user_name)
+        logging.info("user history= %s" %user_query_list[0]['tutorial'])
+        logging.info("user_query_list = %s" %user_query_list)
+        logging.info("user_query_list_json= %s" %user_query_list_json)
 
         logging.info(user.user_id)
         # today_achieve = api.read_achieve_today(date)
@@ -80,6 +92,7 @@ class TimerHandler(webapp2.RequestHandler):
             'userName':user_name,
             'eventList':event_list_json,
             'completedList':completed_list_json,
+            'readTutorial':read_tutorial,
             # 'today':today_achieve,
             # 'total':total_achieve,
             'logout':logout_url

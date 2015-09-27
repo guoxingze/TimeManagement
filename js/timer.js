@@ -2,15 +2,11 @@
 	var workingEvent = "";
 	var ifStopClock = false;
 	var clock;
-	var readTutorial = "{{readTutorial}}";
 	$('#totalAchieve').text(0);
 	$('#todayAchieve').text(0);
 
 
-	if(readTutorial == 'True'){
-		console.log("completedListInDB = " + completedListInDB)
-		showHelp()
-	}
+
 
 	$(document).ready(function() {
 		//set color box
@@ -292,6 +288,7 @@ function AppViewModel() {
 	function showHelp(){
 		$.colorbox({inline:true, width:"1600",height:"600px", overlayClose: false, href:"#tutorialColorBox"});
 	}
+	
 	function updateIfViewTutorial(ifView){
 		$.ajax({
 		  type: "PUT",

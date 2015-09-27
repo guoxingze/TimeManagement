@@ -129,8 +129,13 @@
 		//set event list
 		var eventListInDB = {{eventList}};
 		var completedListInDB = {{completedList}};
+		var readTutorial = "{{readTutorial}}";
 		
-
+		if(readTutorial == 'True'){
+			showHelp()
+		}else{
+			console.log(readTutorial)
+		}
 		//initial knockout.js
 		window.vm = new AppViewModel();
 		window.vm.eventList(eventListInDB);

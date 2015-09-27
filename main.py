@@ -74,21 +74,17 @@ class TimerHandler(webapp2.RequestHandler):
         user_query_list = list(db.to_dict(User) for User in user_query.run())
         user_query_list_json = json.dumps(user_query_list)
         if_user_exit = user_query.count()
-
+        logging.info("if_user_exit  = %s" %if_user_exit)
         if if_user_exit == 0:
             user_db = database.UsersHistory(name=user_name, tutorial=True)
             user_db.put()
+            read_tutorial = True
+        else:
+            read_tutorial = user_query_list[0]['tutorial']
 
-        read_tutorial = user_query_list[0]['tutorial']
-        logging.info("user name = %s" %user_name)
-        logging.info("user history= %s" %user_query_list[0]['tutorial'])
-        logging.info("user_query_list = %s" %user_query_list)
-        logging.info("user_query_list_json= %s" %user_query_list_json)
+        logging.info("read_tutorial  = %s" %read_tutorial)
 
-        logging.info(user.user_id)
-        # today_achieve = api.read_achieve_today(date)
-        # total_achieve = api.read_achieve_total()
-        
+
         template_values = {
             'userName':user_name,
             'eventList':event_list_json,

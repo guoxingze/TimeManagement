@@ -162,5 +162,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/api/delete', DeleteEventHandler, name='delete'),
     webapp2.Route('/api/complete', CompletedEventHandler, name='complete'),
     webapp2.Route('/api/update_achieve', UpdateAchieveHandler, name='update_achieve'),
-    webapp2.Route('/api/UpdateTutorial', UpdateTutorial, name='UpdateTutorial'),
+    webapp2.Route('/api/update_tutorial', UpdateTutorial, name='UpdateTutorial'),
 ], debug=True)

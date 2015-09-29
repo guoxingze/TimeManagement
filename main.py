@@ -30,7 +30,6 @@ class LoginHandler(webapp2.RequestHandler):
     def post(self):
 
         username = self.request.get('userName')
-        logging.info("username = "+username)
 
         template_values = {
             'userName':username
@@ -41,7 +40,6 @@ class LoginHandler(webapp2.RequestHandler):
 
     def get(self):
         logging.info('test login get')
-        # self.response.write('Hello world!')
         template_values = {
             'userName':'test'
         }
@@ -57,29 +55,34 @@ class TimerHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         if user:
             user_name = user.nickname()
+            # create google logout url
             logout_url = users.create_logout_url('/')
             # uid = str(user.user_id())
         else:
             self.redirect(users.create_login_url(self.request.uri))
 
+    # read todo list 
         event_query = db.GqlQuery(r"SELECT * FROM Event WHERE user = :1 ORDER BY time DESC", str(user_name))
         event_list = list(db.to_dict(event) for event in event_query.run())
         event_list_json = json.dumps(event_list)
-
+    # read achievements list
         completed_query = db.GqlQuery(r"SELECT * FROM CompletedEvent WHERE user = :1 ORDER BY time DESC", str(user_name))
         completed_list = list(db.to_dict(CompletedEvent) for CompletedEvent in completed_query.run())
         completed_list_json = json.dumps(completed_list)
 
+    # read user info
         user_query = db.GqlQuery(r"SELECT tutorial FROM UsersHistory WHERE name = :1", str(user_name))
         user_query_list = list(db.to_dict(User) for User in user_query.run())
         user_query_list_json = json.dumps(user_query_list)
         if_user_exit = user_query.count()
-        logging.info("if_user_exit  = %s" %if_user_exit)
+        
+    # if user not exit ,create user and set view tutorial = True
         if if_user_exit == 0:
             user_db = database.UsersHistory(name=user_name, tutorial=True)
             user_db.put()
             read_tutorial = True
         else:
+            # if user exit, reat view tutorial
             read_tutorial = user_query_list[0]['tutorial']
 
         logging.info("read_tutorial  = %s" %read_tutorial)
@@ -90,10 +93,7 @@ class TimerHandler(webapp2.RequestHandler):
             'eventList':event_list_json,
             'completedList':completed_list_json,
             'readTutorial':read_tutorial,
-            # 'today':today_achieve,
-            # 'total':total_achieve,
             'logout':logout_url
-            # 'eventList':eventList
         }
         path = os.path.join(os.path.dirname(__file__), 'view', 'timer.html')
         self.response.out.write(template.render(path, template_values))

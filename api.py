@@ -32,9 +32,10 @@ def read_achieve_today(date):
     """
     read today's achievements count
     """
-    # today_date = str(datetime.now().strftime('%Y-%m-%d'))
-    # query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE time LIKE '%s'" % today_date)
+    # get user id
     uid = users.get_current_user().nickname()
+
+    # read today's achievements
     query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE date = :1 and user = :2", date, uid)
     results = query.count()
     logging.info("count = %s" % query.count())
@@ -45,6 +46,8 @@ def read_achieve_total():
     read total achievements count
     """
     uid = users.get_current_user().nickname()
+
+    # read total achievements
     query = db.GqlQuery(r"SELECT name FROM CompletedEvent WHERE user = :1", uid)
     results = query.count()
     logging.info("count = %s" % query.count())
@@ -57,12 +60,13 @@ class UpdateTutorial(webapp2.RequestHandler):
 
     def put(self):
         """
-        update tutorial in user db
+        update if view tutorial in user db
         """
         data = json.loads(self.request.body)
         if_view = data['ifView']
 
         uid = users.get_current_user().nickname()
+        # set ifView
         user_query = db.GqlQuery(r"SELECT * FROM UsersHistory WHERE name = :1", str(uid))
 
         record = user_query[0]
@@ -118,6 +122,7 @@ class SaveEventHandler(webapp2.RequestHandler):
         event_name = data['eventName']
         current_time = data['time']
         uid = users.get_current_user().nickname()
+# save new event to DB
         event = database.Event(name=event_name, user=uid, time=current_time)
         event.put()
 
@@ -133,7 +138,7 @@ class DeleteEventHandler(webapp2.RequestHandler):
 
         data = json.loads(self.request.body)
         event_name = data['eventName']
-
+# delte event
         query = db.GqlQuery(r"SELECT * FROM Event WHERE name = '%s'" % event_name)
         results = query.fetch(1)
         db.delete(results)

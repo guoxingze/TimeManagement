@@ -6,8 +6,6 @@
 	$('#todayAchieve').text(0);
 
 
-
-
 	$(document).ready(function() {
 		//set color box
 		$.colorbox.settings.close = 'Exit';
@@ -65,17 +63,13 @@ function AppViewModel() {
     self.addToDoEvent = function() {
     	var newEventName = $("#newEventName").val();
         saveNewEvent(newEventName);
-        // self.eventList.push({ name: newEventName });
         self.eventList.splice(0,0,{ name: newEventName });
-        // $("#newEventName").val('');
         self.newEventName("");
     };
 
     self.addCompletedEvent = function(name,time) {
     	console.log('test addCompletedEvent')
-        // self.completedList.push({ name: name,time:time});
         self.completedList.splice(0,0,{ name: name,time:time});
-        // $("#newEventName").val('');
         self.newEventName("");
     };
 
@@ -108,7 +102,7 @@ function AppViewModel() {
 		}
 	}
 
-
+// event checkbox handler
 	function checkEvent(element){
 	$('.eventCheck').not(element).each(function(){
          $(this).attr('checked', false);
@@ -197,7 +191,6 @@ function AppViewModel() {
 		    console.log("total = " + data['total'])
 		    $('#totalAchieve').text(data['total']);
 		    $('#todayAchieve').text(data['today']);
-		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}
 
@@ -211,7 +204,6 @@ function AppViewModel() {
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event added");
-		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}
 
@@ -224,7 +216,6 @@ function AppViewModel() {
 		})
 		.done(function( data ) { // check why I use done
 		    console.log( "event deleted");
-		    // $('.voteCount').text(data['story']['vote_count']);
 		});
 	}
 

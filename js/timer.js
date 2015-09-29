@@ -286,7 +286,7 @@ function AppViewModel() {
 	}
 
 	function showHelp(){
-		$.colorbox({inline:true, width:"1600",height:"600px", overlayClose: false, href:"#tutorialColorBox"});
+		$.colorbox({inline:true, width:"1200",height:"480px", overlayClose: false, href:"#tutorialColorBox"});
 	}
 	
 	function updateIfViewTutorial(ifView){
